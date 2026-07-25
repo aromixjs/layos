@@ -1,20 +1,24 @@
 {
 	"name": "layos",
 	"version": "0.1.0",
-	"description": "Layos - A modular npm package",
+	"description": "Compose web elements from layers of appearance and behavior",
 	"type": "module",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/layos/layos.git"
+		"url": "https://github.com/aromixjs/layos.git"
 	},
 	"bugs": {
-		"url": "https://github.com/layos/layos/issues"
+		"url": "https://github.com/aromixjs/layos/issues"
 	},
 	"keywords": [
 		"layos",
-		"utility",
-		"library"
+		"dom",
+		"components",
+		"css",
+		"styling",
+		"browser",
+		"ui"
 	],
 	"files": [
 		"dist"
@@ -41,7 +45,6 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@types/node": "^22.10.2",
 		"beachball": "^2.65.5",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
