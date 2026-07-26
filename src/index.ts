@@ -1,5 +1,9 @@
-const elements =document.querySelectorAll('[lay]')
+const elements =document.querySelector('[lay]')
 
-console.log(elements);
-console.log('test');
+const value = elements?.getAttribute('lay')
+
+
+
+
+
 
