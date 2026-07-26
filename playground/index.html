@@ -1,17 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <p lay="flex">
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Commodi eius aut
-      inventore, eaque sed optio praesentium libero iste fugiat mollitia
-      corrupti eligendi ut enim molestiae quos, modi, consequuntur temporibus
-      corporis?
-    </p>
-    <script type="module" src="./../dist/index.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Layos MVP Sandbox</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #111;
+      color: white;
+    }
+    div {
+      color: white;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Static tokens</h3>
+  <div lay="flex bg:secondary pad:md">
+    Static Box (bg:secondary pad:md)
+  </div>
+
+  <br>
+
+  <h3>Hover scope</h3>
+  <div lay="bg:primary pad:md hover:[ bg:danger pad:lg ]">
+    Hover Me (bg:primary → bg:danger)
+  </div>
+
+  <br>
+
+  <h3>Click toggle class</h3>
+  <div lay="flex bg:secondary pad:md click:[ bg:danger pad:lg ]">
+    Click to Toggle (bg:secondary ↔ bg:danger)
+  </div>
+
+  <br>
+
+  <h3>Toggle visibility</h3>
+  <div lay="flex bg:primary pad:md toggle">
+    Click to Hide Me
+  </div>
+
+  <script type="module">
+    import { createLayos, defaultPlugin } from '../dist/index.js'
+
+    const layos = createLayos([defaultPlugin])
+    layos.mount()
+  </script>
+</body>
 </html>
