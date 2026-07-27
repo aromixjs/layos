@@ -1,12 +1,13 @@
 import { CharCodes } from './charcode'
 import type { TokenNode } from './types'
 
+// docs for this parser are in here: internal/token-parser.md
 export class TokenParser {
 	private isWhiteSpace(code: number) {
 		return code === CharCodes.Space || code === CharCodes.Tab || code === CharCodes.LineFeed || code === CharCodes.Carriage
 	}
 
-	findScopeEnd(source: string, start: number) {
+	private findScopeEnd(source: string, start: number) {
 		let depth = 0
 
 		for (let cursor = start; cursor < source.length; cursor++) {

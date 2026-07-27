@@ -1,27 +1,25 @@
-import { token } from '../dist/index.js'
-
-export const flex = token({
+export const flex = {
 	key: 'flex',
 	run({ element }) {
 		element.style.display = 'flex'
 	},
-})
+}
 
-export const block = token({
+export const block = {
 	key: 'block',
 	run({ element }) {
 		element.style.display = 'block'
 	},
-})
+}
 
-export const grid = token({
+export const grid = {
 	key: 'grid',
 	run({ element }) {
 		element.style.display = 'grid'
 	},
-})
+}
 
-export const bg = token({
+export const bg = {
 	key: 'bg',
 	values: ['primary', 'secondary', 'danger', 'success', 'dark', 'muted'],
 	run({ element, value }) {
@@ -37,9 +35,9 @@ export const bg = token({
 			element.style.backgroundColor = colors[value]
 		}
 	},
-})
+}
 
-export const color = token({
+export const color = {
 	key: 'color',
 	values: ['white', 'muted', 'danger', 'success'],
 	run({ element, value }) {
@@ -53,9 +51,9 @@ export const color = token({
 			element.style.color = colors[value]
 		}
 	},
-})
+}
 
-export const pad = token({
+export const pad = {
 	key: 'pad',
 	values: ['xs', 'sm', 'md', 'lg', 'xl'],
 	run({ element, value }) {
@@ -64,9 +62,9 @@ export const pad = token({
 			element.style.padding = sizes[value]
 		}
 	},
-})
+}
 
-export const gap = token({
+export const gap = {
 	key: 'gap',
 	values: ['sm', 'md', 'lg'],
 	run({ element, value }) {
@@ -75,9 +73,9 @@ export const gap = token({
 			element.style.gap = sizes[value]
 		}
 	},
-})
+}
 
-export const rounded = token({
+export const rounded = {
 	key: 'rounded',
 	values: ['sm', 'md', 'lg', 'full'],
 	run({ element, value }) {
@@ -86,9 +84,9 @@ export const rounded = token({
 			element.style.borderRadius = radii[value]
 		}
 	},
-})
+}
 
-export const w = token({
+export const w = {
 	key: 'w',
 	values: ['full', 'auto', 'fit'],
 	run({ element, value }) {
@@ -97,9 +95,9 @@ export const w = token({
 			element.style.width = widths[value]
 		}
 	},
-})
+}
 
-export const cursor = token({
+export const cursor = {
 	key: 'cursor',
 	values: ['pointer', 'default', 'grab'],
 	run({ element, value }) {
@@ -107,9 +105,9 @@ export const cursor = token({
 			element.style.cursor = value
 		}
 	},
-})
+}
 
-export const fontSize = token({
+export const fontSize = {
 	key: 'fontSize',
 	values: ['sm', 'md', 'lg'],
 	run({ element, value }) {
@@ -118,9 +116,9 @@ export const fontSize = token({
 			element.style.fontSize = sizes[value]
 		}
 	},
-})
+}
 
-export const hover = token({
+export const hover = {
 	key: 'hover',
 	run({ element, scopes, dispatch, signal }) {
 		if (!scopes) return
@@ -160,9 +158,9 @@ export const hover = token({
 		element.addEventListener('mouseenter', applyHover, { signal })
 		element.addEventListener('mouseleave', removeHover, { signal })
 	},
-})
+}
 
-export const focus = token({
+export const focus = {
 	key: 'focus',
 	run({ element, scopes, signal }) {
 		if (!scopes) return
@@ -195,9 +193,9 @@ export const focus = token({
 		element.addEventListener('focus', applyFocus, { signal })
 		element.addEventListener('blur', removeFocus, { signal })
 	},
-})
+}
 
-export const click = token({
+export const click = {
 	key: 'click',
 	run({ element, scopes, signal }) {
 		if (!scopes) return
@@ -250,9 +248,9 @@ export const click = token({
 			{ signal },
 		)
 	},
-})
+}
 
-export const toggle = token({
+export const toggle = {
 	key: 'toggle',
 	run({ element, signal }) {
 		element.addEventListener(
@@ -264,23 +262,23 @@ export const toggle = token({
 			{ signal },
 		)
 	},
-})
+}
 
-export const show = token({
+export const show = {
 	key: 'show',
 	run({ element }) {
 		element.style.display = ''
 	},
-})
+}
 
-export const hide = token({
+export const hide = {
 	key: 'hide',
 	run({ element }) {
 		element.style.display = 'none'
 	},
-})
+}
 
-export const disabled = token({
+export const disabled = {
 	key: 'disabled',
 	run({ element }) {
 		element.setAttribute('aria-disabled', 'true')
@@ -288,7 +286,7 @@ export const disabled = token({
 		element.style.opacity = '0.5'
 		element.style.cursor = 'not-allowed'
 	},
-})
+}
 
 export const layout = [flex, block, grid]
 export const visual = [bg, color, pad, gap, rounded, w, cursor, fontSize]
