@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Layos Playground</title>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -19,8 +17,6 @@
     h3 { color: #64748b; margin: 0 0 0.5rem; font-size: 0.75rem; }
     .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
     .stack { display: flex; flex-direction: column; gap: 12px; }
-    pre { color: #64748b; font-size: 0.7rem; margin: 0; }
-    hr { border: none; border-top: 1px solid #1e293b; margin: 2rem 0; }
     .divider {
       border: none;
       border-top: 2px solid #1e293b;
@@ -59,26 +55,22 @@
       overflow-y: auto;
       margin-top: 8px;
     }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
   <h1>Layos Playground</h1>
   <p style="color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem;">
-    Core tokens · Alpine.js reactive · htmx partial swap — all in one page
+    All styling via Layos tokens — add, remove, update elements
   </p>
 
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- SECTION A: CORE TOKENS                                     -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
+  <span class="section-label">A — Static Tokens</span>
 
-  <span class="section-label">A — Core Tokens</span>
-
-  <h2>A1. Pure CSS Tokens</h2>
-  <h3>Static styling via ctx.css() — no JS behavior</h3>
+  <h2>A1. Layout + Visual</h2>
   <div class="row">
     <div lay="flex bg:primary pad:md rounded:md color:white">
-      flex + bg:primary + pad:md
+      flex + bg:primary
     </div>
     <div lay="flex bg:secondary pad:lg rounded:lg color:white">
       bg:secondary + pad:lg
@@ -88,61 +80,62 @@
     </div>
   </div>
 
-  <h2>A2. Hover — CSS + JS Merged</h2>
-  <h3>Event listener + scoped CSS via :hover suffix</h3>
+  <h2>A2. Hover</h2>
   <div class="row">
-    <div lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger pad:lg ]">
-      hover: bg:primary → bg:danger
+    <div lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+      hover: primary → danger
     </div>
-    <div lay="flex bg:dark pad:md rounded:md color:muted hover:[ bg:success color:white ]">
-      hover: bg:dark → bg:success
+    <div lay="flex bg:dark pad:md rounded:md color:muted hover:[ bg:success ]">
+      hover: dark → success
     </div>
   </div>
 
   <h2>A3. Click Toggle</h2>
-  <h3>Click toggles data-l-active, scoped CSS applied</h3>
   <div class="row">
     <div lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:primary color:white ]">
-      click: bg:dark → bg:primary
+      click: dark → primary
     </div>
     <div lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white pad:lg ]">
-      click: bg:dark → bg:danger + pad:lg
+      click: dark → danger + pad:lg
     </div>
   </div>
 
   <h2>A4. Toggle Visibility</h2>
   <div class="stack">
     <div lay="flex bg:primary pad:md rounded:md color:white toggle cursor:pointer">
-      Click to hide me
+      Click to hide/show me
     </div>
-    <div lay="flex bg:danger pad:md rounded:md color:white toggle cursor:pointer">
-      Click to hide me too
+    <div lay="flex bg:success pad:md rounded:md color:white toggle cursor:pointer">
+      Click to hide/show me too
     </div>
   </div>
 
-  <h2>A5. Dynamic Insertion</h2>
-  <h3>Click to append new [lay] elements — MutationObserver picks them up</h3>
+  <hr class="divider">
+  <span class="section-label">B — Dynamic DOM Operations</span>
+
+  <h2>B1. Add Elements</h2>
+  <h3>Append new [lay] elements — MutationObserver picks them up</h3>
   <div class="row" style="margin-bottom: 8px;">
-    <button onclick="appendStyled()">Append styled</button>
-    <button onclick="appendHover()">Append hover</button>
-    <button onclick="appendClick()">Append click</button>
+    <button onclick="appendStyled()">Add styled</button>
+    <button onclick="appendHover()">Add hover</button>
+    <button onclick="appendClick()">Add click</button>
   </div>
-  <div id="insert-target" class="row"></div>
+  <div id="add-target" class="row"></div>
 
-  <h2>A6. Lay Attribute Change</h2>
+  <h2>B2. Change lay Attribute</h2>
   <h3>Change lay value — engine re-runs, old listeners cleaned up</h3>
   <div class="row" style="margin-bottom: 8px;">
-    <button onclick="changeLay()">Change lay value</button>
+    <button onclick="cycleLay()">Cycle colors</button>
   </div>
-  <div id="change-target"
+  <div id="cycle-target"
        lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
     Current: bg:primary — hover to see bg:danger
   </div>
 
-  <h2>A7. Element Removal</h2>
-  <h3>Remove elements — engine cleans up listeners and CSS rules</h3>
+  <h2>B3. Remove Elements</h2>
+  <h3>Remove elements — engine cleans up listeners and styles</h3>
   <div class="row" style="margin-bottom: 8px;">
-    <button onclick="removeElements()">Remove all below</button>
+    <button onclick="removeAll()">Remove all below</button>
   </div>
   <div id="remove-target" class="row">
     <div lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
@@ -151,193 +144,61 @@
     <div lay="flex bg:success pad:md rounded:md color:white click:[ bg:danger ]">
       Remove me (click)
     </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- SECTION B: ALPINE.JS REACTIVE                             -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-
-  <hr class="divider">
-  <span class="section-label">B — Alpine.js Reactive</span>
-
-  <h2>B1. Alpine Changes lay Attribute</h2>
-  <h3>Alpine reactively updates lay="" → engine re-runs tokens</h3>
-  <div x-data="{ color: 'primary', size: 'md' }">
-    <div class="row" style="margin-bottom: 8px;">
-      <button @click="color = color === 'primary' ? 'danger' : 'primary'">
-        Toggle color (<span x-text="color"></span>)
-      </button>
-      <button @click="size = size === 'md' ? 'lg' : 'md'">
-        Toggle size (<span x-text="size"></span>)
-      </button>
-    </div>
-    <div class="row">
-      <div :lay="`flex bg:${color} pad:${size} rounded:md color:white hover:[ bg:danger ]`">
-        Alpine controls my lay value
-      </div>
-      <div :lay="`flex bg:${color} pad:md rounded:full color:white`">
-        pill — <span x-text="color"></span>
-      </div>
+    <div lay="flex bg:dark pad:md rounded:md color:muted toggle cursor:pointer">
+      Remove me (toggle)
     </div>
   </div>
 
-  <h2>B2. Alpine Adds/Removes Elements</h2>
-  <h3>Alpine pushes to array → new DOM node → MutationObserver picks it up</h3>
-  <div x-data="{
-    items: [
-      { id: 1, bg: 'primary', label: 'Item 1' },
-      { id: 2, bg: 'success', label: 'Item 2' },
-    ],
-    nextId: 3,
-    add() {
-      const colors = ['primary', 'danger', 'success', 'secondary', 'dark']
-      this.items.push({
-        id: this.nextId++,
-        bg: colors[Math.floor(Math.random() * colors.length)],
-        label: 'Item ' + (this.nextId - 1),
-      })
-    },
-    remove(id) { this.items = this.items.filter(i => i.id !== id) },
-    clear() { this.items = [] }
-  }">
-    <div class="row" style="margin-bottom: 8px;">
-      <button @click="add()">Add item</button>
-      <button @click="clear()">Clear all</button>
-    </div>
-    <div class="row">
-      <template x-for="item in items" :key="item.id">
-        <div :lay="`flex bg:${item.bg} pad:md rounded:md color:white hover:[ bg:danger ] cursor:pointer`"
-             @click="remove(item.id)"
-             x-text="item.label + ' (click to remove)'">
-        </div>
-      </template>
-    </div>
-    <pre>Items: <span x-text="JSON.stringify(items.map(i => i.id))"></span></pre>
-  </div>
-
-  <h2>B3. Alpine Toggles Visibility</h2>
-  <h3>Alpine controls lay value with show/hide tokens</h3>
-  <div x-data="{ visible: true }">
-    <div class="row" style="margin-bottom: 8px;">
-      <button @click="visible = !visible">
-        Toggle (<span x-text="visible ? 'shown' : 'hidden'"></span>)
-      </button>
-    </div>
-    <div class="row">
-      <div :lay="`flex bg:primary pad:md rounded:md color:white ${visible ? '' : 'hide'}`">
-        I am <span x-text="visible ? 'visible' : 'hidden'"></span>
-      </div>
-      <div lay="flex bg:success pad:md rounded:md color:white">
-        Always visible
-      </div>
-    </div>
-  </div>
-
-  <h2>B4. Alpine Swaps Entire lay Value</h2>
-  <h3>Complete lay string changes → old listeners aborted, new ones attached</h3>
-  <div x-data="{
-    mode: 'static',
-    modes: {
-      static: 'flex bg:secondary pad:md rounded:md color:white',
-      interactive: 'flex bg:primary pad:md rounded:md color:white hover:[ bg:danger pad:lg ]',
-      clickable: 'flex bg:dark pad:md rounded:md color:muted click:[ bg:success color:white ]',
-    }
-  }">
-    <div class="row" style="margin-bottom: 8px;">
-      <button @click="mode = 'static'">Static</button>
-      <button @click="mode = 'interactive'">Hover</button>
-      <button @click="mode = 'clickable'">Click</button>
-    </div>
-    <div class="row">
-      <div :lay="modes[mode]" x-text="`Mode: ${mode}`"></div>
-    </div>
-    <pre>lay: <span x-text="modes[mode]"></span></pre>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- SECTION C: HTMX PARTIAL SWAP                              -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-
-  <hr class="divider">
-  <span class="section-label">C — htmx Partial Swap</span>
-
-  <h2>C1. innerHTML — Append Server Fragment</h2>
-  <h3>Server returns HTML → htmx injects → layos initializes new [lay] elements</h3>
+  <h2>B4. Programmatic Update</h2>
+  <h3>Directly update element — no re-run, just style change</h3>
   <div class="row" style="margin-bottom: 8px;">
-    <button hx-get="/api/card" hx-target="#swap-inner" hx-swap="innerHTML">
-      Fetch card
-    </button>
-    <button hx-get="/api/card-hover" hx-target="#swap-inner" hx-swap="innerHTML">
-      Fetch hover card
-    </button>
+    <button onclick="directUpdate()">Direct style update</button>
+    <button onclick="addThenRemove()">Add then remove</button>
   </div>
-  <div id="swap-inner" class="row"></div>
-
-  <h2>C2. outerHTML — Replace Element Entirely</h2>
-  <h3>Server returns new element → htmx replaces old → layos cleans up, re-inits</h3>
-  <div style="margin-bottom: 8px;">
-    <button hx-get="/api/replace-card" hx-target="#swap-outer" hx-swap="outerHTML">
-      Replace card
-    </button>
-  </div>
-  <div id="swap-outer">
+  <div id="program-target" class="row">
+    <div id="direct-elem"
+         lay="flex bg:primary pad:md rounded:md color:white">
+      Direct update me
+    </div>
     <div lay="flex bg:secondary pad:md rounded:md color:white">
-      Original — click replace to swap me
+      Always secondary
     </div>
   </div>
 
-  <h2>C3. Delete — Remove Element</h2>
-  <h3>Server returns 204 → htmx removes → layos cleans up</h3>
-  <div class="stack" id="delete-stack">
-    <div lay="flex bg:primary pad:md rounded:md color:white cursor:pointer"
-         hx-delete="/api/delete" hx-target="#delete-stack" hx-swap="outerHTML">
-      Click to delete me
-    </div>
-    <div lay="flex bg:success pad:md rounded:md color:white cursor:pointer"
-         hx-delete="/api/delete" hx-target="#delete-stack" hx-swap="outerHTML">
-      Or delete me
-    </div>
+  <hr class="divider">
+  <span class="section-label">C — Lifecycle</span>
+
+  <h2>C1. Re-run on Attribute Change</h2>
+  <h3>Change lay → old AbortController aborted → new one created</h3>
+  <div class="row" style="margin-bottom: 8px;">
+    <button onclick="reRun()">Re-run with different tokens</button>
+  </div>
+  <div id="rerun-target"
+       lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+    Re-run me — hover state will reset
   </div>
 
-  <h2>C4. Multi-Element Swap</h2>
-  <h3>Server returns fragment with multiple [lay] elements → all initialized</h3>
-  <div style="margin-bottom: 8px;">
-    <button hx-get="/api/list" hx-target="#swap-multi" hx-swap="innerHTML">
-      Fetch list (3 items)
-    </button>
-    <button hx-get="/api/list-different" hx-target="#swap-multi" hx-swap="innerHTML">
-      Fetch different list
-    </button>
+  <h2>C2. Mass Add / Remove</h2>
+  <h3>Stress test — add 10 elements, then remove them all</h3>
+  <div class="row" style="margin-bottom: 8px;">
+    <button onclick="massAdd()">Add 10</button>
+    <button onclick="massRemove()">Remove all</button>
   </div>
-  <div id="swap-multi" class="stack"></div>
-
-  <h2>C5. Live Ticks</h2>
-  <h3>Append new [lay] elements one by one</h3>
-  <div style="margin-bottom: 8px;">
-    <button hx-get="/api/tick" hx-target="#swap-poll" hx-swap="beforeend" hx-trigger="click">
-      Add tick
-    </button>
-  </div>
-  <div id="swap-poll" class="row"></div>
-
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- LOG                                                        -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div id="mass-target" class="row"></div>
 
   <hr class="divider">
   <h3>Event log</h3>
   <div id="log"></div>
 
-  <!-- ═══════════════════════════════════════════════════════════ -->
-  <!-- SCRIPT                                                     -->
-  <!-- ═══════════════════════════════════════════════════════════ -->
-
   <script type="module">
     import { layos } from '../dist/index.js'
     import { defaultPlugin } from './tokens.js'
 
-    // ─── Init layos ────────────────────────────────────────────
-    const engine = layos(defaultPlugin)
+    const layosInstance = layos({
+      tokens: defaultPlugin,
+      target: document.body,
+    })
+
     let counter = 0
 
     function log(msg) {
@@ -346,121 +207,116 @@
       el.scrollTop = el.scrollHeight
     }
 
-    // Log re-runs for visibility
-    const originalRun = engine.run.bind(engine)
-    engine.run = function (el, layValue) {
-      log(`re-run [${el.id || el.tagName}]: lay="${layValue.slice(0, 60)}"`)
-      return originalRun(el, layValue)
-    }
-
-    // ─── A5. Dynamic insertion ─────────────────────────────────
     window.appendStyled = () => {
       const div = document.createElement('div')
       div.setAttribute('lay', 'flex bg:success pad:md rounded:md color:white')
-      div.textContent = `Dynamic #${++counter}`
-      document.getElementById('insert-target').appendChild(div)
-      log(`Inserted styled div`)
+      div.textContent = `Styled #${++counter}`
+      document.getElementById('add-target').appendChild(div)
+      log(`Added styled div`)
     }
+
     window.appendHover = () => {
       const div = document.createElement('div')
-      div.setAttribute('lay', 'flex bg:dark pad:md rounded:md color:muted hover:[ bg:primary color:white ]')
-      div.textContent = `Hover me #${counter}`
-      document.getElementById('insert-target').appendChild(div)
-      log(`Inserted hover div`)
+      div.setAttribute('lay', 'flex bg:dark pad:md rounded:md color:muted hover:[ bg:primary ]')
+      div.textContent = `Hover #${counter}`
+      document.getElementById('add-target').appendChild(div)
+      log(`Added hover div`)
     }
+
     window.appendClick = () => {
       const div = document.createElement('div')
       div.setAttribute('lay', 'flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white ]')
-      div.textContent = `Click me #${counter}`
-      document.getElementById('insert-target').appendChild(div)
-      log(`Inserted click div`)
+      div.textContent = `Click #${counter}`
+      document.getElementById('add-target').appendChild(div)
+      log(`Added click div`)
     }
 
-    // ─── A6. Lay attribute change ──────────────────────────────
-    let layState = 'primary'
-    const layValues = ['primary', 'secondary', 'danger', 'success', 'dark']
-    window.changeLay = () => {
-      const idx = (layValues.indexOf(layState) + 1) % layValues.length
-      layState = layValues[idx]
-      document.getElementById('change-target')
-        .setAttribute('lay', `flex bg:${layState} pad:md rounded:md color:white hover:[ bg:danger ]`)
-      log(`Changed lay to bg:${layState}`)
+    let cycleState = 'primary'
+    const cycleColors = ['primary', 'secondary', 'danger', 'success', 'dark']
+
+    window.cycleLay = () => {
+      const idx = (cycleColors.indexOf(cycleState) + 1) % cycleColors.length
+      cycleState = cycleColors[idx]
+      document.getElementById('cycle-target')
+        .setAttribute('lay', `flex bg:${cycleState} pad:md rounded:md color:white hover:[ bg:danger ]`)
+      log(`Changed lay to bg:${cycleState}`)
     }
 
-    // ─── A7. Element removal ───────────────────────────────────
-    window.removeElements = () => {
+    window.removeAll = () => {
       const target = document.getElementById('remove-target')
       const count = target.querySelectorAll('[lay]').length
       target.innerHTML = ''
       log(`Removed ${count} elements`)
     }
 
-    // ─── C: htmx mock server ──────────────────────────────────
-    const mockRoutes = {
-      '/api/card': () =>
-        `<div lay="flex bg:success pad:md rounded:md color:white">
-          Server card #${++counter}
-        </div>`,
-      '/api/card-hover': () =>
-        `<div lay="flex bg:dark pad:md rounded:md color:muted hover:[ bg:primary color:white ]">
-          Server hover card #${++counter}
-        </div>`,
-      '/api/replace-card': () =>
-        `<div lay="flex bg:danger pad:lg rounded:lg color:white hover:[ bg:success ]"
-              id="swap-outer">
-          Replaced #${++counter} — hover me
-        </div>`,
-      '/api/delete': () => '',
-      '/api/list': () =>
-        ['primary', 'success', 'danger'].map((c, i) =>
-          `<div lay="flex bg:${c} pad:md rounded:md color:white hover:[ bg:dark ]">
-            List ${i + 1} — ${c}
-          </div>`
-        ).join(''),
-      '/api/list-different': () =>
-        ['secondary', 'muted', 'dark'].map((c, i) =>
-          `<div lay="flex bg:${c} pad:md rounded:md color:white click:[ bg:danger ]">
-            Alt ${i + 1} — ${c}
-          </div>`
-        ).join(''),
-      '/api/tick': () =>
-        `<div lay="flex bg:${['primary', 'success', 'danger', 'secondary'][counter % 4]} pad:sm rounded:full color:white"
-              style="font-size:0.8rem">tick #${++counter}</div>`,
+    window.directUpdate = () => {
+      const elem = document.getElementById('direct-elem')
+      const colors = ['primary', 'secondary', 'danger', 'success', 'dark']
+      const randomColor = colors[Math.floor(Math.random() * colors.length)]
+      elem.style.backgroundColor = {
+        primary: '#3b82f6',
+        secondary: '#6b7280',
+        danger: '#ef4444',
+        success: '#22c55e',
+        dark: '#1e293b',
+      }[randomColor]
+      log(`Directly updated style to bg:${randomColor}`)
     }
 
-    htmx.defineExtension('mock-server', {
-      onEvent(name, evt) {
-        if (name !== 'htmx:beforeRequest') return
-        const elt = evt.detail.elt
-        const path = elt.getAttribute('hx-get') || elt.getAttribute('hx-delete')
-        const method = elt.hasAttribute('hx-delete') ? 'DELETE' : 'GET'
-        if (!path || !mockRoutes[path]) return
+    window.addThenRemove = () => {
+      const target = document.getElementById('program-target')
+      const div = document.createElement('div')
+      div.setAttribute('lay', 'flex bg:danger pad:md rounded:md color:white')
+      div.textContent = `Temporary #${++counter}`
+      div.id = `temp-${counter}`
+      target.appendChild(div)
+      log(`Added temporary div`)
 
-        const html = mockRoutes[path]()
-        log(`${method} ${path} → ${html.length ? html.length + 'B' : '204'}`)
+      setTimeout(() => {
+        const temp = document.getElementById(`temp-${counter}`)
+        if (temp) {
+          temp.remove()
+          log(`Removed temporary div`)
+        }
+      }, 1500)
+    }
 
-        setTimeout(() => {
-          if (method === 'DELETE' || !html) {
-            const parent = elt.parentNode
-            if (parent) { parent.removeChild(elt); log(`Removed element`) }
-          } else if (elt.getAttribute('hx-swap') === 'outerHTML') {
-            const target = document.querySelector(elt.getAttribute('hx-target'))
-            const temp = document.createElement('div')
-            temp.innerHTML = html
-            target.parentNode.replaceChild(temp.firstElementChild, target)
-            log(`outerHTML swap`)
-          } else {
-            const target = document.querySelector(elt.getAttribute('hx-target'))
-            target.insertAdjacentHTML('beforeend', html)
-            log(`innerHTML append`)
-          }
-        }, 150)
+    let rerunState = false
 
-        evt.preventDefault()
-      },
-    })
+    window.reRun = () => {
+      rerunState = !rerunState
+      const elem = document.getElementById('rerun-target')
+      if (rerunState) {
+        elem.setAttribute('lay', 'flex bg:danger pad:md rounded:md color:white hover:[ bg:success ]')
+        log(`Re-run: switched to bg:danger + hover:bg:success`)
+      } else {
+        elem.setAttribute('lay', 'flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]')
+        log(`Re-run: switched to bg:primary + hover:bg:danger`)
+      }
+    }
 
-    log('Playground loaded — Alpine.js + htmx + Layos')
+    const massColors = ['primary', 'secondary', 'danger', 'success', 'dark', 'muted']
+
+    window.massAdd = () => {
+      const target = document.getElementById('mass-target')
+      for (let i = 0; i < 10; i++) {
+        const div = document.createElement('div')
+        const color = massColors[Math.floor(Math.random() * massColors.length)]
+        div.setAttribute('lay', `flex bg:${color} pad:sm rounded:sm color:white`)
+        div.textContent = `#${++counter}`
+        target.appendChild(div)
+      }
+      log(`Added 10 elements`)
+    }
+
+    window.massRemove = () => {
+      const target = document.getElementById('mass-target')
+      const count = target.querySelectorAll('[lay]').length
+      target.innerHTML = ''
+      log(`Removed ${count} elements`)
+    }
+
+    log('Playground loaded — Layos tokens active')
   </script>
 </body>
 </html>

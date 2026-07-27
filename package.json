@@ -11,8 +11,18 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/layos/issues"
 	},
-	"keywords": ["layos", "dom", "components", "css", "styling", "browser", "ui"],
-	"files": ["dist"],
+	"keywords": [
+		"layos",
+		"dom",
+		"components",
+		"css",
+		"styling",
+		"browser",
+		"ui"
+	],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -37,6 +47,7 @@
 		"@biomejs/biome": "^1.9.4",
 		"beachball": "^2.65.5",
 		"playwright": "^1.62.0",
+		"terser": "^5.49.0",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
 		"vitest": "^4.1.6"

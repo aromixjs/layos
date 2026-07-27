@@ -1,33 +1,30 @@
 import { token } from '../dist/index.js'
 
-// ─── Pure CSS tokens ───────────────────────────────────────────
-// These apply styles via ctx.css(). No JS behavior.
-
 export const flex = token({
 	key: 'flex',
-	run({ css }) {
-		css({ display: 'flex' })
+	run({ element }) {
+		element.style.display = 'flex'
 	},
 })
 
 export const block = token({
 	key: 'block',
-	run({ css }) {
-		css({ display: 'block' })
+	run({ element }) {
+		element.style.display = 'block'
 	},
 })
 
 export const grid = token({
 	key: 'grid',
-	run({ css }) {
-		css({ display: 'grid' })
+	run({ element }) {
+		element.style.display = 'grid'
 	},
 })
 
 export const bg = token({
 	key: 'bg',
 	values: ['primary', 'secondary', 'danger', 'success', 'dark', 'muted'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const colors = {
 			primary: '#3b82f6',
 			secondary: '#6b7280',
@@ -37,7 +34,7 @@ export const bg = token({
 			muted: '#374151',
 		}
 		if (value && colors[value]) {
-			css({ 'background-color': colors[value] })
+			element.style.backgroundColor = colors[value]
 		}
 	},
 })
@@ -45,7 +42,7 @@ export const bg = token({
 export const color = token({
 	key: 'color',
 	values: ['white', 'muted', 'danger', 'success'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const colors = {
 			white: '#ffffff',
 			muted: '#9ca3af',
@@ -53,7 +50,7 @@ export const color = token({
 			success: '#86efac',
 		}
 		if (value && colors[value]) {
-			css({ color: colors[value] })
+			element.style.color = colors[value]
 		}
 	},
 })
@@ -61,10 +58,10 @@ export const color = token({
 export const pad = token({
 	key: 'pad',
 	values: ['xs', 'sm', 'md', 'lg', 'xl'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const sizes = { xs: '4px', sm: '8px', md: '16px', lg: '24px', xl: '32px' }
 		if (value && sizes[value]) {
-			css({ padding: sizes[value] })
+			element.style.padding = sizes[value]
 		}
 	},
 })
@@ -72,10 +69,10 @@ export const pad = token({
 export const gap = token({
 	key: 'gap',
 	values: ['sm', 'md', 'lg'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const sizes = { sm: '8px', md: '16px', lg: '24px' }
 		if (value && sizes[value]) {
-			css({ gap: sizes[value] })
+			element.style.gap = sizes[value]
 		}
 	},
 })
@@ -83,10 +80,10 @@ export const gap = token({
 export const rounded = token({
 	key: 'rounded',
 	values: ['sm', 'md', 'lg', 'full'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const radii = { sm: '4px', md: '8px', lg: '12px', full: '9999px' }
 		if (value && radii[value]) {
-			css({ 'border-radius': radii[value] })
+			element.style.borderRadius = radii[value]
 		}
 	},
 })
@@ -94,10 +91,10 @@ export const rounded = token({
 export const w = token({
 	key: 'w',
 	values: ['full', 'auto', 'fit'],
-	run({ css, value }) {
+	run({ element, value }) {
 		const widths = { full: '100%', auto: 'auto', fit: 'fit-content' }
 		if (value && widths[value]) {
-			css({ width: widths[value] })
+			element.style.width = widths[value]
 		}
 	},
 })
@@ -105,114 +102,169 @@ export const w = token({
 export const cursor = token({
 	key: 'cursor',
 	values: ['pointer', 'default', 'grab'],
-	run({ css, value }) {
+	run({ element, value }) {
 		if (value) {
-			css({ cursor: value })
+			element.style.cursor = value
 		}
 	},
 })
 
-// ─── Behavior tokens ───────────────────────────────────────────
-// These attach event listeners. CSS is applied via suffix.
+export const fontSize = token({
+	key: 'fontSize',
+	values: ['sm', 'md', 'lg'],
+	run({ element, value }) {
+		const sizes = { sm: '0.8rem', md: '1rem', lg: '1.25rem' }
+		if (value && sizes[value]) {
+			element.style.fontSize = sizes[value]
+		}
+	},
+})
 
 export const hover = token({
 	key: 'hover',
-	run({ element, scope, dispatch, signal }) {
-		if (!scope) return
-		element.addEventListener(
-			'mouseenter',
-			() => {
-				dispatch(element, scope, ':hover')
-			},
-			{ signal },
-		)
+	run({ element, scopes, dispatch, signal }) {
+		if (!scopes) return
+		const normalStyles = new Map()
+		const hoverStyles = new Map()
+
+		for (const node of scopes) {
+			const key = node.key
+			const val = node.value
+			if (key === 'bg') {
+				const colors = {
+					primary: '#3b82f6', secondary: '#6b7280', danger: '#ef4444',
+					success: '#22c55e', dark: '#1e293b', muted: '#374151',
+				}
+				const normal = colors[val] || colors.primary
+				const current = element.style.backgroundColor || normal
+				normalStyles.set('backgroundColor', current)
+				hoverStyles.set('backgroundColor', normal)
+			}
+		}
+
+		const applyHover = () => {
+			for (const [prop, val] of hoverStyles) {
+				element.style[prop] = val
+			}
+		}
+		const removeHover = () => {
+			for (const [prop, val] of normalStyles) {
+				element.style[prop] = val
+			}
+		}
+
+		element.addEventListener('mouseenter', applyHover, { signal })
+		element.addEventListener('mouseleave', removeHover, { signal })
 	},
 })
 
 export const focus = token({
 	key: 'focus',
-	run({ element, scope, dispatch, signal }) {
-		if (!scope) return
-		element.addEventListener(
-			'focus',
-			() => {
-				dispatch(element, scope, ':focus')
-			},
-			{ signal },
-		)
-		element.addEventListener(
-			'blur',
-			() => {
-				dispatch(element, scope, ':focus')
-			},
-			{ signal },
-		)
+	run({ element, scopes, signal }) {
+		if (!scopes) return
+		const focusStyles = new Map()
+
+		for (const node of scopes) {
+			const key = node.key
+			const val = node.value
+			if (key === 'bg') {
+				const colors = { primary: '#3b82f6', danger: '#ef4444', success: '#22c55e' }
+				if (val && colors[val]) focusStyles.set('backgroundColor', colors[val])
+			}
+		}
+
+		const applyFocus = () => {
+			for (const [prop, val] of focusStyles) {
+				element.style[prop] = val
+			}
+			element.style.outline = '2px solid currentColor'
+		}
+		const removeFocus = () => {
+			element.style.backgroundColor = ''
+			element.style.outline = ''
+		}
+
+		element.addEventListener('focus', applyFocus, { signal })
+		element.addEventListener('blur', removeFocus, { signal })
 	},
 })
 
-// ─── Compound behavior tokens ──────────────────────────────────
-// CSS + JS merged: event listeners that apply scoped styles.
-
 export const click = token({
 	key: 'click',
-	run({ element, scope, dispatch, signal }) {
-		if (!scope) return
+	run({ element, scopes, signal }) {
+		if (!scopes) return
 		let active = false
-		element.addEventListener(
-			'click',
-			() => {
-				active = !active
-				if (active) {
-					element.setAttribute('data-l-active', '')
-					dispatch(element, scope, '[data-l-active]')
-				} else {
-					element.removeAttribute('data-l-active')
+
+		const clickStyles = new Map()
+		for (const node of scopes) {
+			if (node.key === 'bg') {
+				const colors = { primary: '#3b82f6', danger: '#ef4444', success: '#22c55e' }
+				if (node.value && colors[node.value]) clickStyles.set('backgroundColor', colors[node.value])
+			}
+			if (node.key === 'color') {
+				const colors = { white: '#ffffff', muted: '#9ca3af' }
+				if (node.value && colors[node.value]) clickStyles.set('color', colors[node.value])
+			}
+			if (node.key === 'pad') {
+				const sizes = { md: '16px', lg: '24px' }
+				if (node.value && sizes[node.value]) clickStyles.set('padding', sizes[node.value])
+			}
+		}
+
+		const normalBg = element.style.backgroundColor
+		const normalColor = element.style.color
+		const normalPad = element.style.padding
+
+		element.addEventListener('click', () => {
+			active = !active
+			if (active) {
+				for (const [prop, val] of clickStyles) {
+					element.style[prop] = val
 				}
-			},
-			{ signal },
-		)
+			} else {
+				element.style.backgroundColor = normalBg
+				element.style.color = normalColor
+				element.style.padding = normalPad
+			}
+		}, { signal })
 	},
 })
 
 export const toggle = token({
 	key: 'toggle',
 	run({ element, signal }) {
-		element.addEventListener(
-			'click',
-			() => {
-				element.toggleAttribute('data-l-hidden')
-			},
-			{ signal },
-		)
+		element.addEventListener('click', () => {
+			const hidden = element.style.display === 'none'
+			element.style.display = hidden ? '' : 'none'
+		}, { signal })
 	},
 })
 
 export const show = token({
 	key: 'show',
 	run({ element }) {
-		element.removeAttribute('data-l-hidden')
+		element.style.display = ''
 	},
 })
 
 export const hide = token({
 	key: 'hide',
 	run({ element }) {
-		element.setAttribute('data-l-hidden', '')
+		element.style.display = 'none'
 	},
 })
 
 export const disabled = token({
 	key: 'disabled',
-	run({ element, css }) {
+	run({ element }) {
 		element.setAttribute('aria-disabled', 'true')
 		element.style.pointerEvents = 'none'
-		css({ opacity: '0.5', cursor: 'not-allowed' })
+		element.style.opacity = '0.5'
+		element.style.cursor = 'not-allowed'
 	},
 })
 
-// ─── Token arrays ──────────────────────────────────────────────
-
 export const layout = [flex, block, grid]
-export const visual = [bg, color, pad, gap, rounded, w, cursor]
+export const visual = [bg, color, pad, gap, rounded, w, cursor, fontSize]
 export const behavior = [hover, focus, click, toggle, show, hide, disabled]
 export const defaultPlugin = [...layout, ...visual, ...behavior]
