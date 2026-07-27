@@ -1,6 +1,7 @@
 # Layos Internals
 
-This document explains how Layos works under the hood — the internal mechanics, data flow, and lifecycle management.
+This document explains how Layos works under the hood — the internal mechanics,
+data flow, and lifecycle management.
 
 ## Architecture Overview
 
@@ -56,8 +57,11 @@ for each token:
 ```
 
 Key points:
-- Flat registry — all tokens (including scoped ones) are stored at the same level
-- No nesting in the registry — `hover` and `hover > bg` are both top-level entries
+
+- Flat registry — all tokens (including scoped ones) are stored at the same
+  level
+- No nesting in the registry — `hover` and `hover > bg` are both top-level
+  entries
 - First registration wins — duplicate keys are ignored
 
 ### 2. Orchestrator
@@ -74,22 +78,26 @@ controllers: WeakMap         — element → AbortController mapping
 
 **Key methods:**
 
-| Method | Purpose |
-|--------|---------|
-| `scan(root)` | Find all `[lay]` elements under root, call `run()` on each |
-| `run(element, layValue)` | Clean up element, parse lay value, dispatch tokens |
-| `cleanup(element)` | Abort controller, remove element's inline styles |
-| `dispatch(element, nodes, signal)` | Look up each token in registry, execute its handler |
+| Method                             | Purpose                                                    |
+| ---------------------------------- | ---------------------------------------------------------- |
+| `scan(root)`                       | Find all `[lay]` elements under root, call `run()` on each |
+| `run(element, layValue)`           | Clean up element, parse lay value, dispatch tokens         |
+| `cleanup(element)`                 | Abort controller, remove element's inline styles           |
+| `dispatch(element, nodes, signal)` | Look up each token in registry, execute its handler        |
 
 ### 3. TokenParser
 
-Converts a lay attribute string into a `TokenNode[]` array. See [token-parser.md](./token-parser.md) for detailed parsing logic.
+Converts a lay attribute string into a `TokenNode[]` array. See
+[token-parser.md](./token-parser.md) for detailed parsing logic.
 
 ### 4. AbortController (per element)
 
-Each element gets its own `AbortController` stored in a `WeakMap<HTMLElement, AbortController>`.
+Each element gets its own `AbortController` stored in a
+`WeakMap<HTMLElement, AbortController>`.
 
-**Why:** Tokens like `hover`, `click`, `focus` add event listeners. These listeners need to be cleaned up when:
+**Why:** Tokens like `hover`, `click`, `focus` add event listeners. These
+listeners need to be cleaned up when:
+
 - The element is re-run (lay attribute changes)
 - The element is removed from the DOM
 
@@ -116,6 +124,7 @@ run(element, layValue)
 ```
 
 When `cleanup()` is called:
+
 ```
 cleanup(element)
     │
@@ -127,6 +136,7 @@ cleanup(element)
 ```
 
 **WeakMap benefits:**
+
 - No manual cleanup needed when element is GC'd
 - Prevents memory leaks in long-running apps
 
@@ -138,11 +148,11 @@ Watches the DOM for changes and triggers appropriate orchestrator methods.
 
 ```typescript
 observer.observe(target, {
-    attributes: true,           // watch for attribute changes
-    attributeFilter: ['lay'],   // only watch 'lay' attribute
-    childList: true,            // watch for added/removed nodes
-    subtree: true,              // watch entire subtree
-})
+  attributes: true, // watch for attribute changes
+  attributeFilter: ["lay"], // only watch 'lay' attribute
+  childList: true, // watch for added/removed nodes
+  subtree: true, // watch entire subtree
+});
 ```
 
 **Mutation handling:**
@@ -326,16 +336,19 @@ When a token's `run()` is called, it receives a `TokenContext`:
 
 - `element`: The DOM element with the `lay` attribute
 - `value`: Only present for key-value tokens (`bg:red` → value is `"red"`)
-- `scopes`: Only present for scoped tokens (`hover:[ bg:red ]` → scopes is `[{ key: "bg", value: "red" }]`)
-- `signal`: Use this when adding event listeners — they'll auto-cleanup on re-run or removal
-- `dispatch`: Allows tokens to re-dispatch tokens on other elements (e.g., toggling classes)
+- `scopes`: Only present for scoped tokens (`hover:[ bg:red ]` → scopes is
+  `[{ key: "bg", value: "red" }]`)
+- `signal`: Use this when adding event listeners — they'll auto-cleanup on
+  re-run or removal
+- `dispatch`: Allows tokens to re-dispatch tokens on other elements (e.g.,
+  toggling classes)
 
 ## Performance Characteristics
 
-| Operation | Complexity | Notes |
-|-----------|-----------|-------|
-| Token lookup | O(1) | Map.get() by key |
-| Parse lay value | O(n) | n = length of lay string |
-| Scan root | O(m) | m = number of [lay] elements |
-| Cleanup element | O(1) | AbortController.abort() |
-| MutationObserver | O(1) | Browser-native, efficient |
+| Operation        | Complexity | Notes                        |
+| ---------------- | ---------- | ---------------------------- |
+| Token lookup     | O(1)       | Map.get() by key             |
+| Parse lay value  | O(n)       | n = length of lay string     |
+| Scan root        | O(m)       | m = number of [lay] elements |
+| Cleanup element  | O(1)       | AbortController.abort()      |
+| MutationObserver | O(1)       | Browser-native, efficient    |

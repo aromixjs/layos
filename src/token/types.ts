@@ -4,10 +4,10 @@ export interface TokenNode {
 	scopes?: TokenNode[]
 }
 
-export interface TokenDef {
+export interface Token {
 	key: string
 	values?: string[]
-	scopes?: TokenDef[]
+	scopes?: Token[]
 	run(ctx: TokenContext): void
 }
 
@@ -17,8 +17,4 @@ export interface TokenContext {
 	scopes?: TokenNode[]
 	signal: AbortSignal
 	dispatch(element: HTMLElement, nodes: TokenNode[]): void
-}
-
-export function token(def: TokenDef) {
-	return def
 }

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Layos Playground</title>
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <title>Layos Playground</title>
+    <style>
     body {
       font-family: system-ui, sans-serif;
       padding: 2rem;
@@ -11,12 +11,37 @@
       color: #e2e8f0;
       margin: 0;
     }
-    h1 { color: #e2e8f0; font-size: 1.25rem; margin: 0 0 0.5rem; }
-    h2 { color: #94a3b8; margin: 2.5rem 0 0.5rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    h2:first-of-type { margin-top: 0; }
-    h3 { color: #64748b; margin: 0 0 0.5rem; font-size: 0.75rem; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
-    .stack { display: flex; flex-direction: column; gap: 12px; }
+    h1 {
+      color: #e2e8f0;
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem;
+    }
+    h2 {
+      color: #94a3b8;
+      margin: 2.5rem 0 0.5rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    h2:first-of-type {
+      margin-top: 0;
+    }
+    h3 {
+      color: #64748b;
+      margin: 0 0 0.5rem;
+      font-size: 0.75rem;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
     .divider {
       border: none;
       border-top: 2px solid #1e293b;
@@ -42,7 +67,9 @@
       cursor: pointer;
       font-size: 0.8rem;
     }
-    button:hover { background: #475569; }
+    button:hover {
+      background: #475569;
+    }
     #log {
       background: #1e293b;
       border: 1px solid #334155;
@@ -55,268 +82,300 @@
       overflow-y: auto;
       margin-top: 8px;
     }
-    .hidden { display: none; }
-  </style>
-</head>
-<body>
-
-  <h1>Layos Playground</h1>
-  <p style="color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem;">
+    .hidden {
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Layos Playground</h1>
+    <p style="color: #64748b; font-size: 0.8rem; margin: 0 0 1.5rem;">
     All styling via Layos tokens — add, remove, update elements
   </p>
 
-  <span class="section-label">A — Static Tokens</span>
+    <span class="section-label">A — Static Tokens</span>
 
-  <h2>A1. Layout + Visual</h2>
-  <div class="row">
-    <div lay="flex bg:primary pad:md rounded:md color:white">
+    <h2>A1. Layout + Visual</h2>
+    <div class="row">
+      <div lay="flex bg:primary pad:md rounded:md color:white">
       flex + bg:primary
     </div>
-    <div lay="flex bg:secondary pad:lg rounded:lg color:white">
+      <div lay="flex bg:secondary pad:lg rounded:lg color:white">
       bg:secondary + pad:lg
     </div>
-    <div lay="flex bg:success pad:sm rounded:full color:white cursor:pointer">
+      <div lay="flex bg:success pad:sm rounded:full color:white cursor:pointer">
       bg:success + rounded:full
     </div>
-  </div>
+    </div>
 
-  <h2>A2. Hover</h2>
-  <div class="row">
-    <div lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+    <h2>A2. Hover</h2>
+    <div class="row">
+      <div
+        lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
       hover: primary → danger
     </div>
-    <div lay="flex bg:dark pad:md rounded:md color:muted hover:[ bg:success ]">
+      <div
+        lay="flex bg:dark pad:md rounded:md color:muted hover:[ bg:success ]">
       hover: dark → success
     </div>
-  </div>
+    </div>
 
-  <h2>A3. Click Toggle</h2>
-  <div class="row">
-    <div lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:primary color:white ]">
+    <h2>A3. Click Toggle</h2>
+    <div class="row">
+      <div
+        lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:primary color:white ]">
       click: dark → primary
     </div>
-    <div lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white pad:lg ]">
+      <div
+        lay="flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white pad:lg ]">
       click: dark → danger + pad:lg
     </div>
-  </div>
+    </div>
 
-  <h2>A4. Toggle Visibility</h2>
-  <div class="stack">
-    <div lay="flex bg:primary pad:md rounded:md color:white toggle cursor:pointer">
+    <h2>A4. Toggle Visibility</h2>
+    <div class="stack">
+      <div
+        lay="flex bg:primary pad:md rounded:md color:white toggle cursor:pointer">
       Click to hide/show me
     </div>
-    <div lay="flex bg:success pad:md rounded:md color:white toggle cursor:pointer">
+      <div
+        lay="flex bg:success pad:md rounded:md color:white toggle cursor:pointer">
       Click to hide/show me too
     </div>
-  </div>
+    </div>
 
-  <hr class="divider">
-  <span class="section-label">B — Dynamic DOM Operations</span>
+    <hr class="divider">
+    <span class="section-label">B — Dynamic DOM Operations</span>
 
-  <h2>B1. Add Elements</h2>
-  <h3>Append new [lay] elements — MutationObserver picks them up</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="appendStyled()">Add styled</button>
-    <button onclick="appendHover()">Add hover</button>
-    <button onclick="appendClick()">Add click</button>
-  </div>
-  <div id="add-target" class="row"></div>
+    <h2>B1. Add Elements</h2>
+    <h3>Append new [lay] elements — MutationObserver picks them up</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="appendStyled()">Add styled</button>
+      <button onclick="appendHover()">Add hover</button>
+      <button onclick="appendClick()">Add click</button>
+    </div>
+    <div id="add-target" class="row"></div>
 
-  <h2>B2. Change lay Attribute</h2>
-  <h3>Change lay value — engine re-runs, old listeners cleaned up</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="cycleLay()">Cycle colors</button>
-  </div>
-  <div id="cycle-target"
-       lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+    <h2>B2. Change lay Attribute</h2>
+    <h3>Change lay value — engine re-runs, old listeners cleaned up</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="cycleLay()">Cycle colors</button>
+    </div>
+    <div id="cycle-target"
+      lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
     Current: bg:primary — hover to see bg:danger
   </div>
 
-  <h2>B3. Remove Elements</h2>
-  <h3>Remove elements — engine cleans up listeners and styles</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="removeAll()">Remove all below</button>
-  </div>
-  <div id="remove-target" class="row">
-    <div lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+    <h2>B3. Remove Elements</h2>
+    <h3>Remove elements — engine cleans up listeners and styles</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="removeAll()">Remove all below</button>
+    </div>
+    <div id="remove-target" class="row">
+      <div
+        lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
       Remove me (hover)
     </div>
-    <div lay="flex bg:success pad:md rounded:md color:white click:[ bg:danger ]">
+      <div
+        lay="flex bg:success pad:md rounded:md color:white click:[ bg:danger ]">
       Remove me (click)
     </div>
-    <div lay="flex bg:dark pad:md rounded:md color:muted toggle cursor:pointer">
+      <div
+        lay="flex bg:dark pad:md rounded:md color:muted toggle cursor:pointer">
       Remove me (toggle)
     </div>
-  </div>
+    </div>
 
-  <h2>B4. Programmatic Update</h2>
-  <h3>Directly update element — no re-run, just style change</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="directUpdate()">Direct style update</button>
-    <button onclick="addThenRemove()">Add then remove</button>
-  </div>
-  <div id="program-target" class="row">
-    <div id="direct-elem"
-         lay="flex bg:primary pad:md rounded:md color:white">
+    <h2>B4. Programmatic Update</h2>
+    <h3>Directly update element — no re-run, just style change</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="directUpdate()">Direct style update</button>
+      <button onclick="addThenRemove()">Add then remove</button>
+    </div>
+    <div id="program-target" class="row">
+      <div id="direct-elem"
+        lay="flex bg:primary pad:md rounded:md color:white">
       Direct update me
     </div>
-    <div lay="flex bg:secondary pad:md rounded:md color:white">
+      <div lay="flex bg:secondary pad:md rounded:md color:white">
       Always secondary
     </div>
-  </div>
+    </div>
 
-  <hr class="divider">
-  <span class="section-label">C — Lifecycle</span>
+    <hr class="divider">
+    <span class="section-label">C — Lifecycle</span>
 
-  <h2>C1. Re-run on Attribute Change</h2>
-  <h3>Change lay → old AbortController aborted → new one created</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="reRun()">Re-run with different tokens</button>
-  </div>
-  <div id="rerun-target"
-       lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
+    <h2>C1. Re-run on Attribute Change</h2>
+    <h3>Change lay → old AbortController aborted → new one created</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="reRun()">Re-run with different tokens</button>
+    </div>
+    <div id="rerun-target"
+      lay="flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]">
     Re-run me — hover state will reset
   </div>
 
-  <h2>C2. Mass Add / Remove</h2>
-  <h3>Stress test — add 10 elements, then remove them all</h3>
-  <div class="row" style="margin-bottom: 8px;">
-    <button onclick="massAdd()">Add 10</button>
-    <button onclick="massRemove()">Remove all</button>
-  </div>
-  <div id="mass-target" class="row"></div>
+    <h2>C2. Mass Add / Remove</h2>
+    <h3>Stress test — add 10 elements, then remove them all</h3>
+    <div class="row" style="margin-bottom: 8px;">
+      <button onclick="massAdd()">Add 10</button>
+      <button onclick="massRemove()">Remove all</button>
+    </div>
+    <div id="mass-target" class="row"></div>
 
-  <hr class="divider">
-  <h3>Event log</h3>
-  <div id="log"></div>
+    <hr class="divider">
+    <h3>Event log</h3>
+    <div id="log"></div>
 
-  <script type="module">
-    import { layos } from '../dist/index.js'
-    import { defaultPlugin } from './tokens.js'
+    <script type="module">
+    import { layos } from "../dist/index.js";
+    import { defaultPlugin } from "./tokens.js";
 
     const layosInstance = layos({
       tokens: defaultPlugin,
       target: document.body,
-    })
+    });
 
-    let counter = 0
+    let counter = 0;
 
     function log(msg) {
-      const el = document.getElementById('log')
-      el.textContent += `${++counter}. ${msg}\n`
-      el.scrollTop = el.scrollHeight
+      const el = document.getElementById("log");
+      el.textContent += `${++counter}. ${msg}\n`;
+      el.scrollTop = el.scrollHeight;
     }
 
     window.appendStyled = () => {
-      const div = document.createElement('div')
-      div.setAttribute('lay', 'flex bg:success pad:md rounded:md color:white')
-      div.textContent = `Styled #${++counter}`
-      document.getElementById('add-target').appendChild(div)
-      log(`Added styled div`)
-    }
+      const div = document.createElement("div");
+      div.setAttribute("lay", "flex bg:success pad:md rounded:md color:white");
+      div.textContent = `Styled #${++counter}`;
+      document.getElementById("add-target").appendChild(div);
+      log(`Added styled div`);
+    };
 
     window.appendHover = () => {
-      const div = document.createElement('div')
-      div.setAttribute('lay', 'flex bg:dark pad:md rounded:md color:muted hover:[ bg:primary ]')
-      div.textContent = `Hover #${counter}`
-      document.getElementById('add-target').appendChild(div)
-      log(`Added hover div`)
-    }
+      const div = document.createElement("div");
+      div.setAttribute(
+        "lay",
+        "flex bg:dark pad:md rounded:md color:muted hover:[ bg:primary ]",
+      );
+      div.textContent = `Hover #${counter}`;
+      document.getElementById("add-target").appendChild(div);
+      log(`Added hover div`);
+    };
 
     window.appendClick = () => {
-      const div = document.createElement('div')
-      div.setAttribute('lay', 'flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white ]')
-      div.textContent = `Click #${counter}`
-      document.getElementById('add-target').appendChild(div)
-      log(`Added click div`)
-    }
+      const div = document.createElement("div");
+      div.setAttribute(
+        "lay",
+        "flex bg:dark pad:md rounded:md color:muted click:[ bg:danger color:white ]",
+      );
+      div.textContent = `Click #${counter}`;
+      document.getElementById("add-target").appendChild(div);
+      log(`Added click div`);
+    };
 
-    let cycleState = 'primary'
-    const cycleColors = ['primary', 'secondary', 'danger', 'success', 'dark']
+    let cycleState = "primary";
+    const cycleColors = ["primary", "secondary", "danger", "success", "dark"];
 
     window.cycleLay = () => {
-      const idx = (cycleColors.indexOf(cycleState) + 1) % cycleColors.length
-      cycleState = cycleColors[idx]
-      document.getElementById('cycle-target')
-        .setAttribute('lay', `flex bg:${cycleState} pad:md rounded:md color:white hover:[ bg:danger ]`)
-      log(`Changed lay to bg:${cycleState}`)
-    }
+      const idx = (cycleColors.indexOf(cycleState) + 1) % cycleColors.length;
+      cycleState = cycleColors[idx];
+      document.getElementById("cycle-target")
+        .setAttribute(
+          "lay",
+          `flex bg:${cycleState} pad:md rounded:md color:white hover:[ bg:danger ]`,
+        );
+      log(`Changed lay to bg:${cycleState}`);
+    };
 
     window.removeAll = () => {
-      const target = document.getElementById('remove-target')
-      const count = target.querySelectorAll('[lay]').length
-      target.innerHTML = ''
-      log(`Removed ${count} elements`)
-    }
+      const target = document.getElementById("remove-target");
+      const count = target.querySelectorAll("[lay]").length;
+      target.innerHTML = "";
+      log(`Removed ${count} elements`);
+    };
 
     window.directUpdate = () => {
-      const elem = document.getElementById('direct-elem')
-      const colors = ['primary', 'secondary', 'danger', 'success', 'dark']
-      const randomColor = colors[Math.floor(Math.random() * colors.length)]
+      const elem = document.getElementById("direct-elem");
+      const colors = ["primary", "secondary", "danger", "success", "dark"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
       elem.style.backgroundColor = {
-        primary: '#3b82f6',
-        secondary: '#6b7280',
-        danger: '#ef4444',
-        success: '#22c55e',
-        dark: '#1e293b',
-      }[randomColor]
-      log(`Directly updated style to bg:${randomColor}`)
-    }
+        primary: "#3b82f6",
+        secondary: "#6b7280",
+        danger: "#ef4444",
+        success: "#22c55e",
+        dark: "#1e293b",
+      }[randomColor];
+      log(`Directly updated style to bg:${randomColor}`);
+    };
 
     window.addThenRemove = () => {
-      const target = document.getElementById('program-target')
-      const div = document.createElement('div')
-      div.setAttribute('lay', 'flex bg:danger pad:md rounded:md color:white')
-      div.textContent = `Temporary #${++counter}`
-      div.id = `temp-${counter}`
-      target.appendChild(div)
-      log(`Added temporary div`)
+      const target = document.getElementById("program-target");
+      const div = document.createElement("div");
+      div.setAttribute("lay", "flex bg:danger pad:md rounded:md color:white");
+      div.textContent = `Temporary #${++counter}`;
+      div.id = `temp-${counter}`;
+      target.appendChild(div);
+      log(`Added temporary div`);
 
       setTimeout(() => {
-        const temp = document.getElementById(`temp-${counter}`)
+        const temp = document.getElementById(`temp-${counter}`);
         if (temp) {
-          temp.remove()
-          log(`Removed temporary div`)
+          temp.remove();
+          log(`Removed temporary div`);
         }
-      }, 1500)
-    }
+      }, 1500);
+    };
 
-    let rerunState = false
+    let rerunState = false;
 
     window.reRun = () => {
-      rerunState = !rerunState
-      const elem = document.getElementById('rerun-target')
+      rerunState = !rerunState;
+      const elem = document.getElementById("rerun-target");
       if (rerunState) {
-        elem.setAttribute('lay', 'flex bg:danger pad:md rounded:md color:white hover:[ bg:success ]')
-        log(`Re-run: switched to bg:danger + hover:bg:success`)
+        elem.setAttribute(
+          "lay",
+          "flex bg:danger pad:md rounded:md color:white hover:[ bg:success ]",
+        );
+        log(`Re-run: switched to bg:danger + hover:bg:success`);
       } else {
-        elem.setAttribute('lay', 'flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]')
-        log(`Re-run: switched to bg:primary + hover:bg:danger`)
+        elem.setAttribute(
+          "lay",
+          "flex bg:primary pad:md rounded:md color:white hover:[ bg:danger ]",
+        );
+        log(`Re-run: switched to bg:primary + hover:bg:danger`);
       }
-    }
+    };
 
-    const massColors = ['primary', 'secondary', 'danger', 'success', 'dark', 'muted']
+    const massColors = [
+      "primary",
+      "secondary",
+      "danger",
+      "success",
+      "dark",
+      "muted",
+    ];
 
     window.massAdd = () => {
-      const target = document.getElementById('mass-target')
+      const target = document.getElementById("mass-target");
       for (let i = 0; i < 10; i++) {
-        const div = document.createElement('div')
-        const color = massColors[Math.floor(Math.random() * massColors.length)]
-        div.setAttribute('lay', `flex bg:${color} pad:sm rounded:sm color:white`)
-        div.textContent = `#${++counter}`
-        target.appendChild(div)
+        const div = document.createElement("div");
+        const color = massColors[Math.floor(Math.random() * massColors.length)];
+        div.setAttribute("lay", `flex bg:${color} pad:sm rounded:sm color:white`);
+        div.textContent = `#${++counter}`;
+        target.appendChild(div);
       }
-      log(`Added 10 elements`)
-    }
+      log(`Added 10 elements`);
+    };
 
     window.massRemove = () => {
-      const target = document.getElementById('mass-target')
-      const count = target.querySelectorAll('[lay]').length
-      target.innerHTML = ''
-      log(`Removed ${count} elements`)
-    }
+      const target = document.getElementById("mass-target");
+      const count = target.querySelectorAll("[lay]").length;
+      target.innerHTML = "";
+      log(`Removed ${count} elements`);
+    };
 
-    log('Playground loaded — Layos tokens active')
-  </script>
-</body>
+    log("Playground loaded — Layos tokens active");
+    </script>
+  </body>
 </html>

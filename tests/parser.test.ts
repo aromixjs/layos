@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { TokenParser } from '../src/parser'
+import { describe, expect, it } from 'vitest'
+import { TokenParser } from '../src/token/parser'
 
 const parser = (input: string) => new TokenParser().parse(input)
 
@@ -13,11 +13,23 @@ describe('TokenParser', () => {
 	})
 
 	it('parses multiple tokens', () => {
-		expect(parser('flex bg:primary pad:md')).toEqual([{ key: 'flex' }, { key: 'bg', value: 'primary' }, { key: 'pad', value: 'md' }])
+		expect(parser('flex bg:primary pad:md')).toEqual([
+			{ key: 'flex' },
+			{
+				key: 'bg',
+				value: 'primary',
+			},
+			{ key: 'pad', value: 'md' },
+		])
 	})
 
 	it('parses scopesd tokens', () => {
-		expect(parser('hover:[ bg:red ]')).toEqual([{ key: 'hover', scopes: [{ key: 'bg', value: 'red' }] }])
+		expect(parser('hover:[ bg:red ]')).toEqual([
+			{
+				key: 'hover',
+				scopes: [{ key: 'bg', value: 'red' }],
+			},
+		])
 	})
 
 	it('parses scopes with multiple tokens', () => {
@@ -42,7 +54,12 @@ describe('TokenParser', () => {
 	})
 
 	it('parses nested scopess', () => {
-		expect(parser('a:[ b:[ c:deep ] ]')).toEqual([{ key: 'a', scopes: [{ key: 'b', scopes: [{ key: 'c', value: 'deep' }] }] }])
+		expect(parser('a:[ b:[ c:deep ] ]')).toEqual([
+			{
+				key: 'a',
+				scopes: [{ key: 'b', scopes: [{ key: 'c', value: 'deep' }] }],
+			},
+		])
 	})
 
 	it('parses triple nesting', () => {
@@ -62,7 +79,10 @@ describe('TokenParser', () => {
 	it('parses mixed nesting depths in one input', () => {
 		expect(parser('a:[ b:val ] c:[ d:[ e:val2 ] ]')).toEqual([
 			{ key: 'a', scopes: [{ key: 'b', value: 'val' }] },
-			{ key: 'c', scopes: [{ key: 'd', scopes: [{ key: 'e', value: 'val2' }] }] },
+			{
+				key: 'c',
+				scopes: [{ key: 'd', scopes: [{ key: 'e', value: 'val2' }] }],
+			},
 		])
 	})
 
@@ -83,7 +103,13 @@ describe('TokenParser', () => {
 		expect(parser('a:[ b c:[ d ] e ]')).toEqual([
 			{
 				key: 'a',
-				scopes: [{ key: 'b' }, { key: 'c', scopes: [{ key: 'd' }] }, { key: 'e' }],
+				scopes: [
+					{ key: 'b' },
+					{ key: 'c', scopes: [{ key: 'd' }] },
+					{
+						key: 'e',
+					},
+				],
 			},
 		])
 	})
@@ -95,7 +121,10 @@ describe('TokenParser', () => {
 				scopes: [
 					{ key: 'a', value: '1' },
 					{ key: 'b', scopes: [{ key: 'c', value: '2' }, { key: 'd' }] },
-					{ key: 'e', scopes: [{ key: 'f', scopes: [{ key: 'g', value: '3' }] }] },
+					{
+						key: 'e',
+						scopes: [{ key: 'f', scopes: [{ key: 'g', value: '3' }] }],
+					},
 				],
 			},
 		])
@@ -114,11 +143,24 @@ describe('TokenParser', () => {
 	})
 
 	it('handles multiple whitespace between tokens', () => {
-		expect(parser('flex   bg:red')).toEqual([{ key: 'flex' }, { key: 'bg', value: 'red' }])
+		expect(parser('flex   bg:red')).toEqual([
+			{ key: 'flex' },
+			{
+				key: 'bg',
+				value: 'red',
+			},
+		])
 	})
 
 	it('handles tabs and newlines', () => {
-		expect(parser('flex\tbg:red\npad:md')).toEqual([{ key: 'flex' }, { key: 'bg', value: 'red' }, { key: 'pad', value: 'md' }])
+		expect(parser('flex\tbg:red\npad:md')).toEqual([
+			{ key: 'flex' },
+			{
+				key: 'bg',
+				value: 'red',
+			},
+			{ key: 'pad', value: 'md' },
+		])
 	})
 
 	it('handles whitespace inside scopesd tokens', () => {
@@ -134,7 +176,12 @@ describe('TokenParser', () => {
 	})
 
 	it('handles value with colons inside', () => {
-		expect(parser('bg:primary:hover')).toEqual([{ key: 'bg', value: 'primary:hover' }])
+		expect(parser('bg:primary:hover')).toEqual([
+			{
+				key: 'bg',
+				value: 'primary:hover',
+			},
+		])
 	})
 
 	it('skips standalone brackets without preceding colon', () => {

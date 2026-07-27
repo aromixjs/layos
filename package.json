@@ -11,18 +11,8 @@
 	"bugs": {
 		"url": "https://github.com/aromixjs/layos/issues"
 	},
-	"keywords": [
-		"layos",
-		"dom",
-		"components",
-		"css",
-		"styling",
-		"browser",
-		"ui"
-	],
-	"files": [
-		"dist"
-	],
+	"keywords": ["layos", "dom", "components", "css", "styling", "browser", "ui"],
+	"files": ["dist"],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",

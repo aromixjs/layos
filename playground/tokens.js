@@ -132,8 +132,12 @@ export const hover = token({
 			const val = node.value
 			if (key === 'bg') {
 				const colors = {
-					primary: '#3b82f6', secondary: '#6b7280', danger: '#ef4444',
-					success: '#22c55e', dark: '#1e293b', muted: '#374151',
+					primary: '#3b82f6',
+					secondary: '#6b7280',
+					danger: '#ef4444',
+					success: '#22c55e',
+					dark: '#1e293b',
+					muted: '#374151',
 				}
 				const normal = colors[val] || colors.primary
 				const current = element.style.backgroundColor || normal
@@ -168,7 +172,11 @@ export const focus = token({
 			const key = node.key
 			const val = node.value
 			if (key === 'bg') {
-				const colors = { primary: '#3b82f6', danger: '#ef4444', success: '#22c55e' }
+				const colors = {
+					primary: '#3b82f6',
+					danger: '#ef4444',
+					success: '#22c55e',
+				}
 				if (val && colors[val]) focusStyles.set('backgroundColor', colors[val])
 			}
 		}
@@ -198,16 +206,26 @@ export const click = token({
 		const clickStyles = new Map()
 		for (const node of scopes) {
 			if (node.key === 'bg') {
-				const colors = { primary: '#3b82f6', danger: '#ef4444', success: '#22c55e' }
-				if (node.value && colors[node.value]) clickStyles.set('backgroundColor', colors[node.value])
+				const colors = {
+					primary: '#3b82f6',
+					danger: '#ef4444',
+					success: '#22c55e',
+				}
+				if (node.value && colors[node.value]) {
+					clickStyles.set('backgroundColor', colors[node.value])
+				}
 			}
 			if (node.key === 'color') {
 				const colors = { white: '#ffffff', muted: '#9ca3af' }
-				if (node.value && colors[node.value]) clickStyles.set('color', colors[node.value])
+				if (node.value && colors[node.value]) {
+					clickStyles.set('color', colors[node.value])
+				}
 			}
 			if (node.key === 'pad') {
 				const sizes = { md: '16px', lg: '24px' }
-				if (node.value && sizes[node.value]) clickStyles.set('padding', sizes[node.value])
+				if (node.value && sizes[node.value]) {
+					clickStyles.set('padding', sizes[node.value])
+				}
 			}
 		}
 
@@ -215,28 +233,36 @@ export const click = token({
 		const normalColor = element.style.color
 		const normalPad = element.style.padding
 
-		element.addEventListener('click', () => {
-			active = !active
-			if (active) {
-				for (const [prop, val] of clickStyles) {
-					element.style[prop] = val
+		element.addEventListener(
+			'click',
+			() => {
+				active = !active
+				if (active) {
+					for (const [prop, val] of clickStyles) {
+						element.style[prop] = val
+					}
+				} else {
+					element.style.backgroundColor = normalBg
+					element.style.color = normalColor
+					element.style.padding = normalPad
 				}
-			} else {
-				element.style.backgroundColor = normalBg
-				element.style.color = normalColor
-				element.style.padding = normalPad
-			}
-		}, { signal })
+			},
+			{ signal },
+		)
 	},
 })
 
 export const toggle = token({
 	key: 'toggle',
 	run({ element, signal }) {
-		element.addEventListener('click', () => {
-			const hidden = element.style.display === 'none'
-			element.style.display = hidden ? '' : 'none'
-		}, { signal })
+		element.addEventListener(
+			'click',
+			() => {
+				const hidden = element.style.display === 'none'
+				element.style.display = hidden ? '' : 'none'
+			},
+			{ signal },
+		)
 	},
 })
 
