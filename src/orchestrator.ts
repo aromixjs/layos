@@ -12,7 +12,7 @@ export class Orchestrator {
 		}
 	}
 
-	register(tokenDefinition: TokenDef): void {
+	private register(tokenDefinition: TokenDef): void {
 		if (this.tokenRegistry.has(tokenDefinition.key)) {
 			return
 		}

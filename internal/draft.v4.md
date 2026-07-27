@@ -1,7 +1,6 @@
 # Layos — Spec (v4)
 
 **Directive:** `lay=""` **Package:** `layos` **Status:** Pre-implementation, planning phase
-**Target:** Web.
 
 ## Naming
 
@@ -179,36 +178,4 @@ contract; everything behind it is the plugin author's own design.
 
 ---
 
-## Relationship to the View Layer
 
-Layos and the Aromix view layer are separate, tightly connected packages —
-the view layer depends on Layos being stable, and covers the equivalent
-problem for server-driven content. The dividing line: behavior that only
-ever needs to know about itself and its own events belongs in Layos; behavior
-that reacts to something happening elsewhere (another view, another
-connection, the server) belongs to the view layer's mechanism instead.
-
----
-
-## Stability
-
-| Symbol                                      | Tier       |
-| -------------------------------------------- | ---------- |
-| `lay=""` directive                           | LOCKED     |
-| Token syntax `namespace:action[config]`      | LOCKED     |
-| Core (parse/dispatch/state store/delegation/scope) | LOCKED |
-| Plugin API (`definePlugin`/`directives`/`setup`/`ctx`) | LOCKED |
-| `layos([...])` registry shape                | LOCKED     |
-| Local state primitives `toggle:`/`set:`      | EXTENSIBLE |
-| Default token plugin's vocabulary            | EXTENSIBLE |
-| Built-in interaction plugins                  | EXTENSIBLE |
-
----
-
-## Appendix A — Default Plugin Token Reference
-
-The full static token vocabulary from the original spec (layout, spacing,
-sizing, color, typography, visual, composite shorthands, responsive
-breakpoints, built-in interactions, theme config shape) ships as the
-`defaultTokens` plugin. Pull those tables forward verbatim when assembling
-the final document.

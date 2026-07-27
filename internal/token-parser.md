@@ -17,7 +17,7 @@ The parser converts a `lay=""` attribute string into a structured `TokenNode[]` 
 interface TokenNode {
   key: string
   value?: string
-  scope?: TokenNode[]
+  scopes?: TokenNode[]
 }
 ```
 
@@ -52,7 +52,7 @@ If `[` follows `:`:
 1. Find matching `]` using depth tracking
 2. Extract the inner string between `[` and `]`
 3. Recursively parse it into child `TokenNode[]`
-4. Push as `{ key, scope: [...children] }`
+4. Push as `{ key, scopes: [...children] }`
 
 ### Step 6: Read the Value
 If no `[` after `:`, read until whitespace. Colons inside values are allowed (e.g. `bg:primary:hover` → value is `primary:hover`).
@@ -71,8 +71,8 @@ If no `[` after `:`, read until whitespace. Colons inside values are allowed (e.
 |-------|--------|
 | `flex` | `[{ key: "flex" }]` |
 | `bg:red` | `[{ key: "bg", value: "red" }]` |
-| `hover:[ bg:red ]` | `[{ key: "hover", scope: [{ key: "bg", value: "red" }] }]` |
-| `a:[ b:[ c:deep ] ]` | `[{ key: "a", scope: [{ key: "b", scope: [{ key: "c", value: "deep" }] }] }]` |
+| `hover:[ bg:red ]` | `[{ key: "hover", scopes: [{ key: "bg", value: "red" }] }]` |
+| `a:[ b:[ c:deep ] ]` | `[{ key: "a", scopes: [{ key: "b", scopes: [{ key: "c", value: "deep" }] }] }]` |
 | `hover[ bg:red ]` | `[{ key: "hover" }]` (bracket without colon is skipped) |
 | `[ invalid ] flex` | `[{ key: "flex" }]` (standalone brackets are skipped) |
 | `hover:[ bg:red ` | `[]` (unbalanced brackets return empty) |
