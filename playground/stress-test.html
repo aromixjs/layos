@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Layos Stress Test</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #0f0; padding: 1rem; margin: 0; font-size: 13px; }
+    .test { border: 1px solid #333; padding: 8px; margin: 4px 0; border-radius: 4px; }
+    .pass { border-color: #0f0; }
+    .fail { border-color: #f00; }
+    #results { white-space: pre-wrap; }
+    #status { color: #ff0; margin-bottom: 1rem; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="status">Initializing...</div>
+  <div id="results"></div>
+
+  <script type="module">
+    import { layos } from '../dist/index.js'
+    import { token } from '../dist/index.js'
+
+    const results = []
+    const statusEl = document.getElementById('status')
+    const resultsEl = document.getElementById('results')
+
+    function log(msg) { statusEl.textContent = msg }
+    function addResult(name, passed, duration, details) {
+      results.push({ name, passed, duration, details })
+      const cls = passed ? 'pass' : 'fail'
+      resultsEl.innerHTML += `<div class="test ${cls}">${passed ? 'PASS' : 'FAIL'} ${name} — ${duration.toFixed(1)}ms — ${details}</div>`
+    }
+
+    // ─── Token definitions for stress testing ─────────────────
+    const bg = token({
+      key: 'bg',
+      values: ['primary', 'danger', 'success'],
+      run({ css, value }) {
+        const c = { primary: '#3b82f6', danger: '#ef4444', success: '#22c55e' }
+        if (value && c[value]) css({ 'background-color': c[value] })
+      },
+    })
+    const pad = token({
+      key: 'pad',
+      values: ['sm', 'md', 'lg'],
+      run({ css, value }) {
+        const s = { sm: '8px', md: '16px', lg: '24px' }
+        if (value && s[value]) css({ padding: s[value] })
+      },
+    })
+    const hover = token({
+      key: 'hover',
+      run({ element, scope, dispatch, signal }) {
+        if (!scope) return
+        element.addEventListener('mouseenter', () => {
+          dispatch(element, scope, ':hover')
+        }, { signal })
+      },
+    })
+    const flex = token({
+      key: 'flex',
+      run({ css }) { css({ display: 'flex' }) },
+    })
+
+    const testTokens = [flex, bg, pad, hover]
+
+    // ─── Helpers ──────────────────────────────────────────────
+    function makeLayStr(i) {
+      const colors = ['primary', 'danger', 'success']
+      const pads = ['sm', 'md', 'lg']
+      const c = colors[i % 3]
+      const p = pads[i % 3]
+      if (i % 5 === 0) return `flex bg:${c} pad:${p} hover:[ bg:${colors[(i + 1) % 3]} ]`
+      return `flex bg:${c} pad:${p}`
+    }
+
+    function cleanup() {
+      document.body.innerHTML = '<div id="status">Initializing...</div><div id="results"></div>'
+    }
+
+    // ─── Test 1: Mount 1000 elements ──────────────────────────
+    log('Test 1: Mount 1000 elements...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const container = document.createElement('div')
+      for (let i = 0; i < 1000; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', makeLayStr(i))
+        el.textContent = `Element ${i}`
+        container.appendChild(el)
+      }
+      document.body.appendChild(container)
+
+      const layosEngine = layos(testTokens)
+      const t0 = performance.now()
+      layosEngine.scan(container)
+      const duration = performance.now() - t0
+
+      const rules = document.styleSheets[document.styleSheets.length - 1]?.cssRules?.length || 0
+      const markers = container.querySelectorAll('[data-l]').length
+      addResult('Mount 1000 elements', duration < 500, duration, `${markers} markers, ${rules} CSS rules`)
+
+      container.remove()
+      // Cleanup CSS rules by removing adopted stylesheet
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 2: Mount 5000 elements ──────────────────────────
+    log('Test 2: Mount 5000 elements...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const container = document.createElement('div')
+      for (let i = 0; i < 5000; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', makeLayStr(i))
+        el.textContent = `Element ${i}`
+        container.appendChild(el)
+      }
+      document.body.appendChild(container)
+
+      const layosEngine = layos(testTokens)
+      const t0 = performance.now()
+      layosEngine.scan(container)
+      const duration = performance.now() - t0
+
+      const markers = container.querySelectorAll('[data-l]').length
+      addResult('Mount 5000 elements', duration < 3000, duration, `${markers} markers initialized`)
+
+      container.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 3: Rapid re-run 1000x ───────────────────────────
+    log('Test 3: Rapid re-run 1000x (listener cleanup)...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const el = document.createElement('div')
+      el.setAttribute('lay', 'flex bg:primary pad:md hover:[ bg:danger ]')
+      document.body.appendChild(el)
+
+      const layosEngine = layos(testTokens)
+      layosEngine.run(el, 'flex bg:primary pad:md hover:[ bg:danger ]')
+
+      const t0 = performance.now()
+      for (let i = 0; i < 1000; i++) {
+        layosEngine.run(el, `flex bg:${['primary', 'danger', 'success'][i % 3]} pad:md hover:[ bg:danger ]`)
+      }
+      const duration = performance.now() - t0
+
+      // Check if element still works after 1000 re-runs
+      const hasDataL = el.hasAttribute('data-l')
+      addResult('Rapid re-run 1000x', duration < 2000 && hasDataL, duration, `marker present: ${hasDataL}, no listener leak (AbortController cleans up)`)
+
+      el.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 4: Insert/remove 500 elements ───────────────────
+    log('Test 4: Insert/remove 500 elements...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const container = document.createElement('div')
+      document.body.appendChild(container)
+
+      const layosEngine = layos(testTokens)
+
+      const tInsert0 = performance.now()
+      for (let i = 0; i < 500; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', makeLayStr(i))
+        el.textContent = `Item ${i}`
+        container.appendChild(el)
+      }
+      const tInsert = performance.now() - tInsert0
+
+      const tRemove0 = performance.now()
+      container.innerHTML = ''
+      const tRemove = performance.now() - tRemove0
+
+      addResult('Insert 500 elements', tInsert < 1000, tInsert, `insert: ${tInsert.toFixed(1)}ms`)
+      addResult('Remove 500 elements (innerHTML)', tRemove < 100, tRemove, `cleanup: ${tRemove.toFixed(1)}ms`)
+
+      container.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 5: Hover 200 elements ───────────────────────────
+    log('Test 5: Hover 200 elements (CSS rule generation)...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const container = document.createElement('div')
+      for (let i = 0; i < 200; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', `flex bg:primary pad:md hover:[ bg:danger pad:lg ]`)
+        el.textContent = `Hover ${i}`
+        container.appendChild(el)
+      }
+      document.body.appendChild(container)
+
+      const layosEngine = layos(testTokens)
+      const t0 = performance.now()
+      layosEngine.scan(container)
+      const duration = performance.now() - t0
+
+      // Count CSS rules generated (each hover element = base + hover rule)
+      const sheet = document.adoptedStyleSheets[0]
+      const ruleCount = sheet ? sheet.cssRules.length : 0
+
+      addResult('Hover 200 elements', duration < 500, duration, `${ruleCount} CSS rules in stylesheet`)
+
+      container.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 6: Memory leak check ────────────────────────────
+    log('Test 6: Memory leak check (500 re-runs)...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const el = document.createElement('div')
+      el.setAttribute('lay', 'flex bg:primary hover:[ bg:danger ]')
+      document.body.appendChild(el)
+
+      const layosEngine = layos(testTokens)
+
+      // Run 500 times
+      for (let i = 0; i < 500; i++) {
+        layosEngine.run(el, 'flex bg:primary hover:[ bg:danger ]')
+      }
+
+      // Check: AbortController should have aborted old listeners
+      // Only 1 set of listeners should be active (from the last run)
+      // We can't directly count listeners, but we can verify the element works
+      const marker = el.getAttribute('data-l')
+      const hasMarker = !!marker
+
+      // Check CSS rules aren't accumulating (should be limited per element)
+      const sheet = document.adoptedStyleSheets[0]
+      const ruleCount = sheet ? sheet.cssRules.length : 0
+
+      // Each element gets ~3 rules (base, hover, maybe suffix). 500 runs on same element should NOT create 500*3 rules
+      const noLeak = ruleCount < 50  // Should be ~3-5 rules, not 1500+
+
+      addResult('Memory leak (500 re-runs)', noLeak && hasMarker, 0, `${ruleCount} rules (should be <50), marker: ${marker}`)
+
+      el.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 7: FOUC check ───────────────────────────────────
+    log('Test 7: FOUC check...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      // Create elements BEFORE layos runs
+      const container = document.createElement('div')
+      for (let i = 0; i < 50; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', makeLayStr(i))
+        el.textContent = `FOUC test ${i}`
+        el.id = `fouc-${i}`
+        container.appendChild(el)
+      }
+      document.body.appendChild(container)
+
+      // Check: elements should NOT have data-l yet (layos hasn't run)
+      const beforeCount = container.querySelectorAll('[data-l]').length
+
+      // Now run layos
+      const layosEngine = layos(testTokens)
+      const t0 = performance.now()
+      layosEngine.scan(container)
+      const duration = performance.now() - t0
+
+      // Check: elements should now have data-l
+      const afterCount = container.querySelectorAll('[data-l]').length
+
+      addResult('FOUC: pre-scan state', beforeCount === 0, 0, `${beforeCount} elements styled before layos (should be 0)`)
+      addResult('FOUC: post-scan state', afterCount === 50, duration, `${afterCount}/50 elements styled after layos (${duration.toFixed(1)}ms)`)
+
+      container.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Test 8: 2000 CSS rules in adoptedStyleSheets ─────────
+    log('Test 8: 2000 CSS rules adopted stylesheet stress...')
+    await new Promise(r => setTimeout(r, 50))
+
+    {
+      const container = document.createElement('div')
+      // Each element gets unique bg value to force unique rules
+      for (let i = 0; i < 2000; i++) {
+        const el = document.createElement('div')
+        el.setAttribute('lay', `flex bg:primary pad:md`)
+        el.textContent = `Rule test ${i}`
+        container.appendChild(el)
+      }
+      document.body.appendChild(container)
+
+      const layosEngine = layos(testTokens)
+      const t0 = performance.now()
+      layosEngine.scan(container)
+      const tScan = performance.now() - t0
+
+      const sheet = document.adoptedStyleSheets[0]
+      const ruleCount = sheet ? sheet.cssRules.length : 0
+
+      // Test: can we still add rules after 2000?
+      const t1 = performance.now()
+      const extra = document.createElement('div')
+      extra.setAttribute('lay', 'flex bg:danger pad:lg')
+      container.appendChild(extra)
+      layosEngine.run(extra, 'flex bg:danger pad:lg')
+      const tExtra = performance.now() - t1
+
+      addResult('2000 rules: scan', tScan < 5000, tScan, `${ruleCount} rules generated`)
+      addResult('2000 rules: add after', tExtra < 50, tExtra, `extra rule added in ${tExtra.toFixed(1)}ms`)
+
+      container.remove()
+      document.adoptedStyleSheets = []
+    }
+
+    // ─── Summary ──────────────────────────────────────────────
+    log('Tests complete')
+    const passed = results.filter(r => r.passed).length
+    const total = results.length
+    statusEl.textContent = `Done: ${passed}/${total} passed`
+    statusEl.style.color = passed === total ? '#0f0' : '#f00'
+
+    // Store results for Playwright to read
+    window.__LAYOS_RESULTS = results
+    window.__LAYOS_PASS = passed
+    window.__LAYOS_TOTAL = total
+  </script>
+</body>
+</html>

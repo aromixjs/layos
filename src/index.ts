@@ -1,18 +1,12 @@
-import { createEngine, Engine } from "./engine"
-import { TokenDef } from "./token"
+import { TokenDef } from './token'
+import { LayosEngine } from './engine'
 
-/**
- * layos([...tokens]) — that's it. Builds the registry from the given
- * tokens and, if `window`/`document` are present, immediately scans the
- * page and keeps watching for new or changed `lay=""` attributes. No
- * separate mount() call, no config object.
- *
- * In a non-DOM environment (SSR, tests, tooling) it just returns the
- * engine without touching anything, so importing this module is always
- * safe.
- */
-export function layos(tokens: TokenDef[]): Engine {
-	const engine = createEngine(tokens)
+export { token } from './token'
+export type { TokenDef, TokenContext, TokenNode } from './token'
+export { LayosEngine } from './engine'
+
+export function layos(tokens: TokenDef[]): LayosEngine {
+	const engine = new LayosEngine(tokens)
 
 	if (typeof window === 'undefined' || typeof document === 'undefined') {
 		return engine
@@ -26,7 +20,11 @@ export function layos(tokens: TokenDef[]): Engine {
 				if (mutation.type === 'attributes' && mutation.attributeName === 'lay') {
 					const el = mutation.target as HTMLElement
 					const layValue = el.getAttribute('lay')
-					if (layValue) engine.run(el, layValue)
+					if (layValue) {
+						engine.run(el, layValue)
+					} else {
+						engine.cleanup(el)
+					}
 					continue
 				}
 
@@ -35,6 +33,11 @@ export function layos(tokens: TokenDef[]): Engine {
 					const layValue = added.getAttribute('lay')
 					if (layValue) engine.run(added, layValue)
 					engine.scan(added)
+				}
+
+				for (const removed of mutation.removedNodes) {
+					if (!(removed instanceof HTMLElement)) continue
+					cleanupTree(removed)
 				}
 			}
 		})
@@ -45,6 +48,12 @@ export function layos(tokens: TokenDef[]): Engine {
 			childList: true,
 			subtree: true,
 		})
+	}
+
+	function cleanupTree(el: HTMLElement) {
+		if (el.hasAttribute('lay')) engine.cleanup(el)
+		const nested = el.querySelectorAll<HTMLElement>('[lay]')
+		for (const child of nested) engine.cleanup(child)
 	}
 
 	if (document.readyState === 'loading') {

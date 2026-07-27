@@ -4,13 +4,13 @@ export interface TokenNode {
 	scope?: TokenNode[]
 }
 
-
 export interface TokenContext {
 	element: HTMLElement
 	value?: string
 	scope?: TokenNode[]
+	signal: AbortSignal
 
-	dispatch(element: HTMLElement, nodes: TokenNode[],suffix?:string): void
+	dispatch(element: HTMLElement, nodes: TokenNode[]): void
 	css(properties: Record<string, string>): void
 }
 
