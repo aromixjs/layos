@@ -1,4 +1,4 @@
-import { TokenNode } from './token'
+import type { TokenNode } from './token'
 
 const CharCodes = {
 	Space: 32,
@@ -35,14 +35,12 @@ export class TokenParser {
 		return -1
 	}
 
-	// Parses a string into TokenNodes.
 	parse(source: string) {
 		const nodes: TokenNode[] = []
 		let cursor = 0
-		let length = source.length
+		const length = source.length
 
 		while (cursor < length) {
-			// Skip White Spaces
 			while (cursor < length && this.isWhiteSpace(source.charCodeAt(cursor))) {
 				cursor++
 			}
@@ -51,7 +49,6 @@ export class TokenParser {
 			}
 
 			const keyStart = cursor
-			// Scan Forward Until It Finds : or [
 			while (cursor < length) {
 				const code = source.charCodeAt(cursor)
 				if (this.isWhiteSpace(code) || code === CharCodes.Colon || code === CharCodes.OpenBracket) {
@@ -60,20 +57,17 @@ export class TokenParser {
 				cursor++
 			}
 
-			// Extract The Key
 			const key = source.slice(keyStart, cursor)
 
-			// If the key is followed by whitespace or the end, this is a standalone token.
 			if (cursor >= length || this.isWhiteSpace(source.charCodeAt(cursor))) {
 				nodes.push({ key })
 				continue
 			}
 
-			// A Colon Means The token has a value or scope
 			if (source.charCodeAt(cursor) === CharCodes.Colon) {
 				cursor++
 			} else {
-				// Token Was followed By an Unexpected character
+				if (key) nodes.push({ key })
 
 				if (source.charCodeAt(cursor) === CharCodes.OpenBracket) {
 					const end = this.findScopeEnd(source, cursor)
@@ -87,14 +81,13 @@ export class TokenParser {
 				continue
 			}
 
-			// After ':' immediately seeing '[' means a nested scope.
 			if (source.charCodeAt(cursor) === CharCodes.OpenBracket) {
 				const end = this.findScopeEnd(source, cursor)
 				if (end === -1) break
 
 				nodes.push({
 					key,
-					scope: this.parse(source.slice(cursor + 1, end)),
+					scopes: this.parse(source.slice(cursor + 1, end)),
 				})
 				cursor = end + 1
 

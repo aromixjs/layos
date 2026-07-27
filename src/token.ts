@@ -1,24 +1,22 @@
 export interface TokenNode {
 	key: string
 	value?: string
-	scope?: TokenNode[]
-}
-
-export interface TokenContext {
-	element: HTMLElement
-	value?: string
-	scope?: TokenNode[]
-	signal: AbortSignal
-
-	dispatch(element: HTMLElement, nodes: TokenNode[]): void
-	css(properties: Record<string, string>): void
+	scopes?: TokenNode[]
 }
 
 export interface TokenDef {
 	key: string
 	values?: string[]
-	scope?: TokenDef[]
+	scopes?: TokenDef[]
 	run(ctx: TokenContext): void
+}
+
+export interface TokenContext {
+	element: HTMLElement
+	value?: string
+	scopes?: TokenNode[]
+	signal: AbortSignal
+	dispatch(element: HTMLElement, nodes: TokenNode[]): void
 }
 
 export function token(def: TokenDef) {
