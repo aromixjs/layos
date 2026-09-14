@@ -1,6 +1,5 @@
-export { layos } from './core/layos'
+export { layos, LayosConfig } from './core/layos'
 export { Observer } from './core/observer'
 export { Runtime } from './core/runtime'
-export type { LayosConfig } from './core/types'
 export { TokenParser } from './token/parser'
-export type { Token, TokenContext, TokenNode } from './token/types'
+export { Token, TokenContext, TokenNode, token } from './token/types'

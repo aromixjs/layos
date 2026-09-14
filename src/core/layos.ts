@@ -1,6 +1,12 @@
+import { Token } from '../token/types'
 import { Observer } from './observer'
 import { Runtime } from './runtime'
-import { LayosConfig } from './types'
+
+export interface LayosConfig {
+	target: ParentNode
+	tokens: Token[]
+}
+
 
 export function layos(config: LayosConfig) {
 	const runtime = new Runtime(config.tokens)

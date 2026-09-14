@@ -18,3 +18,7 @@ export interface TokenContext {
 	signal: AbortSignal
 	dispatch(element: HTMLElement, nodes: TokenNode[]): void
 }
+
+export function token(def: Token) {
+	return def
+}
