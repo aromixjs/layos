@@ -1,102 +1,119 @@
-import { CharCodes } from './charcode'
-import type { TokenNode } from './types'
+const CharCodes = {
+	Colon: 58,
+	OpenBracket: 91,
+	CloseBracket: 93,
+	Space: 32,
+	Tab: 9,
+	LineFeed: 10,
+	Carriage: 13,
+} as const;
 
-// docs for this parser are in here: internal/token-parser.md
-export class TokenParser {
-	private isWhiteSpace(code: number) {
-		return code === CharCodes.Space || code === CharCodes.Tab || code === CharCodes.LineFeed || code === CharCodes.Carriage
-	}
 
-	private findScopeEnd(source: string, start: number) {
-		let depth = 0
+export function TokenParser(source: string) {
+	const nodes: any[] = []
+	let cursor = 0
+	const length = source.length
 
-		for (let cursor = start; cursor < source.length; cursor++) {
-			const code = source.charCodeAt(cursor)
-			if (code === CharCodes.OpenBracket) {
-				depth++
-				continue
-			}
 
-			if (code === CharCodes.CloseBracket) {
-				depth--
-				if (depth === 0) {
-					return cursor
-				}
-			}
+	while (cursor < length) {
+		// Skip leading whitespace
+		if (
+			TokenParser.IsWhiteSpace(source.charCodeAt(cursor)) &&
+			cursor < length
+		) {
+			cursor++;
+			continue;
 		}
-		return -1
-	}
 
-	parse(source: string) {
-		const nodes: TokenNode[] = []
-		let cursor = 0
-		const length = source.length
-
+		// Scan for the key
+		const keyStart = cursor
 		while (cursor < length) {
-			while (cursor < length && this.isWhiteSpace(source.charCodeAt(cursor))) {
-				cursor++
+			const code = source.charCodeAt(cursor)
+			if (
+				TokenParser.IsWhiteSpace(code) ||
+				code === CharCodes.Colon ||
+				code === CharCodes.OpenBracket
+			) {
+				break;
 			}
-			if (cursor >= length) {
-				break
-			}
+			cursor++
+		}
+		const key = source.slice(keyStart, cursor)
 
-			const keyStart = cursor
-			while (cursor < length) {
-				const code = source.charCodeAt(cursor)
-				if (this.isWhiteSpace(code) || code === CharCodes.Colon || code === CharCodes.OpenBracket) {
-					break
-				}
-				cursor++
-			}
+		// Handles standalone flags without values or scopes
+		if (
+			cursor >= length ||
+			TokenParser.IsWhiteSpace(source.charCodeAt(cursor))
+		) {
+			nodes.push({ key })
+			continue;
+		}
 
-			const key = source.slice(keyStart, cursor)
 
-			if (cursor >= length || this.isWhiteSpace(source.charCodeAt(cursor))) {
-				nodes.push({ key })
-				continue
-			}
+		// Skip the assignment colon
+		if (source.charCodeAt(cursor) === CharCodes.Colon) {
+			cursor++
+		}
 
-			if (source.charCodeAt(cursor) === CharCodes.Colon) {
-				cursor++
-			} else {
-				if (key) nodes.push({ key })
 
-				if (source.charCodeAt(cursor) === CharCodes.OpenBracket) {
-					const end = this.findScopeEnd(source, cursor)
-					if (end === -1) break
+		// Handle nested scope/block when an opening bracket is found
+		if (source.charCodeAt(cursor) === CharCodes.OpenBracket) {
+			const end = TokenParser.ScopeEnd(source, cursor)
+			if (end === -1) break
 
-					cursor = end + 1
-				} else {
-					cursor++
-				}
-
-				continue
-			}
-
-			if (source.charCodeAt(cursor) === CharCodes.OpenBracket) {
-				const end = this.findScopeEnd(source, cursor)
-				if (end === -1) break
-
-				nodes.push({
-					key,
-					scopes: this.parse(source.slice(cursor + 1, end)),
-				})
-				cursor = end + 1
-
-				continue
-			}
-
-			const valueStart = cursor
-			while (cursor < length && !this.isWhiteSpace(source.charCodeAt(cursor))) {
-				cursor++
-			}
-
+			// Recursively parse the inner contents of the brackets
 			nodes.push({
 				key,
-				value: source.slice(valueStart, cursor),
+				scopes: TokenParser(source.slice(cursor + 1, end)),
 			})
+
+			cursor = end + 1
+
+			continue
 		}
 
-		return nodes
+		// Handle scalar/primitive values assigned via colon
+		const valueStart = cursor
+		while (cursor < length && !TokenParser.IsWhiteSpace(source.charCodeAt(cursor))) {
+			cursor++
+		}
+
+		nodes.push({
+			key,
+			value: source.slice(valueStart, cursor),
+		})
 	}
+
+	return nodes
+}
+
+
+
+TokenParser.IsWhiteSpace = (code: number): boolean => {
+	return code === CharCodes.Space ||
+		code === CharCodes.Tab ||
+		code === CharCodes.LineFeed ||
+		code === CharCodes.Carriage
+}
+
+TokenParser.ScopeEnd = (source: string, start: number): number => {
+	let depth = 0
+
+
+	// Track bracket nesting depth to find the exact closing bracket for nested blocks
+	for (let cursor = start; cursor < source.length; cursor++) {
+		const code = source.charCodeAt(cursor)
+		if (code === CharCodes.OpenBracket) {
+			depth++
+			continue
+		}
+
+		if (code === CharCodes.CloseBracket) {
+			depth--
+			if (depth === 0) {
+				return cursor
+			}
+		}
+	}
+	return -1
 }

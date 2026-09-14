@@ -3,7 +3,7 @@ import { Observer } from './observer'
 import { Runtime } from './runtime'
 
 export interface LayosConfig {
-	target: ParentNode
+	root: ParentNode
 	tokens: Token[]
 }
 
@@ -12,12 +12,12 @@ export function layos(config: LayosConfig) {
 	const runtime = new Runtime(config.tokens)
 	const observer = new Observer(runtime)
 
-	runtime.scan(config.target)
+	runtime.scan(config.root)
 
-	if (config.target instanceof Document) {
-		observer.observe(config.target.documentElement)
+	if (config.root instanceof Document) {
+		observer.observe(config.root.documentElement)
 	} else {
-		observer.observe(config.target)
+		observer.observe(config.root)
 	}
 
 	// if it ever needs to disconnect or access internals

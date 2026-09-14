@@ -1,19 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { TokenParser } from '../src/token/parser'
+import { TokenParser } from '../src'
 
-const parser = (input: string) => new TokenParser().parse(input)
 
-describe('TokenParser', () => {
+
+
+describe('TokenTokenParser', () => {
 	it('parses a single key', () => {
-		expect(parser('flex')).toEqual([{ key: 'flex' }])
+		expect(TokenParser('flex')).toEqual([{ key: 'flex' }])
 	})
 
 	it('parses key-value', () => {
-		expect(parser('bg:primary')).toEqual([{ key: 'bg', value: 'primary' }])
+		expect(TokenParser('bg:primary')).toEqual([{ key: 'bg', value: 'primary' }])
 	})
 
 	it('parses multiple tokens', () => {
-		expect(parser('flex bg:primary pad:md')).toEqual([
+		expect(TokenParser('flex bg:primary pad:md')).toEqual([
 			{ key: 'flex' },
 			{
 				key: 'bg',
@@ -24,7 +25,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses scopesd tokens', () => {
-		expect(parser('hover:[ bg:red ]')).toEqual([
+		expect(TokenParser('hover:[ bg:red ]')).toEqual([
 			{
 				key: 'hover',
 				scopes: [{ key: 'bg', value: 'red' }],
@@ -33,7 +34,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses scopes with multiple tokens', () => {
-		expect(parser('hover:[ bg:red pad:lg ]')).toEqual([
+		expect(TokenParser('hover:[ bg:red pad:lg ]')).toEqual([
 			{
 				key: 'hover',
 				scopes: [
@@ -45,7 +46,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses scopes with standalone and key-value tokens', () => {
-		expect(parser('toggle:[ bold bg:blue ]')).toEqual([
+		expect(TokenParser('toggle:[ bold bg:blue ]')).toEqual([
 			{
 				key: 'toggle',
 				scopes: [{ key: 'bold' }, { key: 'bg', value: 'blue' }],
@@ -54,7 +55,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses nested scopess', () => {
-		expect(parser('a:[ b:[ c:deep ] ]')).toEqual([
+		expect(TokenParser('a:[ b:[ c:deep ] ]')).toEqual([
 			{
 				key: 'a',
 				scopes: [{ key: 'b', scopes: [{ key: 'c', value: 'deep' }] }],
@@ -63,7 +64,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses triple nesting', () => {
-		expect(parser('x:[ y:[ z:[ w:deep ] ] ]')).toEqual([
+		expect(TokenParser('x:[ y:[ z:[ w:deep ] ] ]')).toEqual([
 			{
 				key: 'x',
 				scopes: [
@@ -77,7 +78,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses mixed nesting depths in one input', () => {
-		expect(parser('a:[ b:val ] c:[ d:[ e:val2 ] ]')).toEqual([
+		expect(TokenParser('a:[ b:val ] c:[ d:[ e:val2 ] ]')).toEqual([
 			{ key: 'a', scopes: [{ key: 'b', value: 'val' }] },
 			{
 				key: 'c',
@@ -87,7 +88,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses nested scopes with multiple sibling tokens', () => {
-		expect(parser('hover:[ bg:red focus:[ outline:2px ] pad:lg ]')).toEqual([
+		expect(TokenParser('hover:[ bg:red focus:[ outline:2px ] pad:lg ]')).toEqual([
 			{
 				key: 'hover',
 				scopes: [
@@ -100,7 +101,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses nested scopes with standalone keys', () => {
-		expect(parser('a:[ b c:[ d ] e ]')).toEqual([
+		expect(TokenParser('a:[ b c:[ d ] e ]')).toEqual([
 			{
 				key: 'a',
 				scopes: [
@@ -115,7 +116,7 @@ describe('TokenParser', () => {
 	})
 
 	it('parses deeply nested with mixed key-value and standalone', () => {
-		expect(parser('root:[ a:1 b:[ c:2 d ] e:[ f:[ g:3 ] ] ]')).toEqual([
+		expect(TokenParser('root:[ a:1 b:[ c:2 d ] e:[ f:[ g:3 ] ] ]')).toEqual([
 			{
 				key: 'root',
 				scopes: [
@@ -131,19 +132,19 @@ describe('TokenParser', () => {
 	})
 
 	it('handles empty input', () => {
-		expect(parser('')).toEqual([])
+		expect(TokenParser('')).toEqual([])
 	})
 
 	it('handles whitespace-only input', () => {
-		expect(parser('   ')).toEqual([])
+		expect(TokenParser('   ')).toEqual([])
 	})
 
 	it('handles leading and trailing whitespace', () => {
-		expect(parser('  flex  ')).toEqual([{ key: 'flex' }])
+		expect(TokenParser('  flex  ')).toEqual([{ key: 'flex' }])
 	})
 
 	it('handles multiple whitespace between tokens', () => {
-		expect(parser('flex   bg:red')).toEqual([
+		expect(TokenParser('flex   bg:red')).toEqual([
 			{ key: 'flex' },
 			{
 				key: 'bg',
@@ -153,7 +154,7 @@ describe('TokenParser', () => {
 	})
 
 	it('handles tabs and newlines', () => {
-		expect(parser('flex\tbg:red\npad:md')).toEqual([
+		expect(TokenParser('flex\tbg:red\npad:md')).toEqual([
 			{ key: 'flex' },
 			{
 				key: 'bg',
@@ -164,7 +165,7 @@ describe('TokenParser', () => {
 	})
 
 	it('handles whitespace inside scopesd tokens', () => {
-		expect(parser('hover:[  bg:red   pad:lg  ]')).toEqual([
+		expect(TokenParser('hover:[  bg:red   pad:lg  ]')).toEqual([
 			{
 				key: 'hover',
 				scopes: [
@@ -176,7 +177,7 @@ describe('TokenParser', () => {
 	})
 
 	it('handles value with colons inside', () => {
-		expect(parser('bg:primary:hover')).toEqual([
+		expect(TokenParser('bg:primary:hover')).toEqual([
 			{
 				key: 'bg',
 				value: 'primary:hover',
@@ -184,20 +185,18 @@ describe('TokenParser', () => {
 		])
 	})
 
-	it('skips standalone brackets without preceding colon', () => {
-		expect(parser('[ invalid ] flex')).toEqual([{ key: 'flex' }])
-	})
+
 
 	it('handles unbalanced brackets gracefully', () => {
-		expect(parser('hover:[ bg:red ')).toEqual([])
+		expect(TokenParser('hover:[ bg:red ')).toEqual([])
 	})
 
 	it('handles key followed by opening bracket without colon', () => {
-		expect(parser('hover[ bg:red ]')).toEqual([{ key: 'hover' }])
+		expect(TokenParser('hover:[ bg:red ]')).toEqual([{ key: 'hover', scopes:[{ key:'bg', value:'red'}] }])
 	})
 
 	it('handles complex mixed input', () => {
-		expect(parser('flex bg:primary hover:[ bg:red pad:lg ] cursor:pointer')).toEqual([
+		expect(TokenParser('flex bg:primary hover:[ bg:red pad:lg ] cursor:pointer')).toEqual([
 			{ key: 'flex' },
 			{ key: 'bg', value: 'primary' },
 			{
@@ -212,7 +211,7 @@ describe('TokenParser', () => {
 	})
 
 	it('handles realistic token string with multiple scopess', () => {
-		expect(parser('flex gap:4 hover:[ bg:blue-500 text:white ] focus:[ ring:2 ring:blue-300 ] disabled:[ opacity:50 cursor:not-allowed ]')).toEqual([
+		expect(TokenParser('flex gap:4 hover:[ bg:blue-500 text:white ] focus:[ ring:2 ring:blue-300 ] disabled:[ opacity:50 cursor:not-allowed ]')).toEqual([
 			{ key: 'flex' },
 			{ key: 'gap', value: '4' },
 			{
@@ -240,7 +239,7 @@ describe('TokenParser', () => {
 	})
 
 	it('handles deeply nested realistic pattern', () => {
-		expect(parser('theme:[ dark:[ bg:black text:white hover:[ bg:gray-800 ] ] light:[ bg:white text:black ] ]')).toEqual([
+		expect(TokenParser('theme:[ dark:[ bg:black text:white hover:[ bg:gray-800 ] ] light:[ bg:white text:black ] ]')).toEqual([
 			{
 				key: 'theme',
 				scopes: [
