@@ -1,4 +1,3 @@
-import { TokenParser } from '../token/parser'
 import type { Token, TokenContext, TokenNode } from '../token/types'
 
 export class Runtime {
