@@ -1,5 +1,5 @@
 {
-	"name": "lyr",
+	"name": "plyx",
 	"version": "0.1.0",
 	"description": "Compose web elements from layers of appearance and behavior",
 	"type": "module",
